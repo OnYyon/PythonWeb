@@ -1,0 +1,16 @@
+[project]
+name = "template-python"
+version = "0.1.0"
+description = "Github template for projects with uv, ty, and ruff"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+
+]
+
+[dependency-groups]
+dev = [
+    "coverage>=7.13.4",
+    "ruff>=0.15.1",
+    "ty>=0.0.17",
+]
