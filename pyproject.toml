@@ -5,7 +5,7 @@ description = "Github template for projects with uv, ty, and ruff"
 readme = "README.md"
 requires-python = ">=3.14"
 dependencies = [
-
+    "django>=6.0.3",
 ]
 
 [dependency-groups]
