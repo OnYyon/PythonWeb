@@ -12,6 +12,9 @@ repos:
           ]
         additional_dependencies:
           - django
+          - django-stubs
+          - django-split-settings
+          - psycopg[binary]
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.12.0

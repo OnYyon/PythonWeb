@@ -25,7 +25,7 @@ class SubscriptionModel(models.Model):
     amount_paid = models.DecimalField(
         null=True, blank=True, max_digits=10, decimal_places=2
     )
-    transaction_id = models.CharField(max_length=255, blank=True, db_index=True)
+    transaction_id = models.CharField(max_length=255, blank=True, null=True)
     auto_renew = models.BooleanField(default=False)
 
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
@@ -38,6 +38,7 @@ class SubscriptionModel(models.Model):
 class PlanModel(models.Model):
     uuid = models.UUIDField(primary_key=True, default=uuid4)
     name = models.CharField()
+    price = models.DecimalField(max_digits=10, decimal_places=2)
     duration = models.DurationField(default=timedelta(days=30))
 
     class Meta:

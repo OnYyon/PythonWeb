@@ -5,5 +5,5 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "subscription",
+    "src.cinema_platform_django.subscription.apps.SubscriptionConfig",
 ]

@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
+from decimal import Decimal
 from enum import Enum
 from uuid import UUID, uuid4
 
@@ -25,7 +26,8 @@ class PaymentStatus(Enum):
 @dataclass
 class Subscription:
     user_id: UUID
-    sub_id: UUID = field(default_factory=uuid4, doc="Test")
+    plan_id: UUID
+    sub_id: UUID = field(default_factory=uuid4)
     status: SubscriptionStatus = SubscriptionStatus.PENDING
     payment_status: PaymentStatus = PaymentStatus.UNPAID
     started_at: datetime | None = None
@@ -50,8 +52,9 @@ class Subscription:
 @dataclass
 class SubPlan:
     name: str
-    price: int = field()
+    price: Decimal
     plan_id: UUID = field(default_factory=uuid4)
+    duration: timedelta = field(default_factory=lambda: timedelta(days=30))
 
     def __post_init__(self):
         if self.price < 0:
