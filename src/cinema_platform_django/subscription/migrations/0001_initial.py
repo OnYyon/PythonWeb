@@ -2,48 +2,67 @@
 
 import datetime
 import uuid
+
 from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='PlanModel',
+            name="PlanModel",
             fields=[
-                ('uuid', models.UUIDField(default=uuid.uuid4, primary_key=True, serialize=False)),
-                ('name', models.CharField()),
-                ('price', models.DecimalField(decimal_places=2, max_digits=10)),
-                ('duration', models.DurationField(default=datetime.timedelta(days=30))),
+                (
+                    "uuid",
+                    models.UUIDField(
+                        default=uuid.uuid4, primary_key=True, serialize=False
+                    ),
+                ),
+                ("name", models.CharField()),
+                ("price", models.DecimalField(decimal_places=2, max_digits=10)),
+                ("duration", models.DurationField(default=datetime.timedelta(days=30))),
             ],
             options={
-                'db_table': 'SubscriptionsPlans',
+                "db_table": "SubscriptionsPlans",
             },
         ),
         migrations.CreateModel(
-            name='SubscriptionModel',
+            name="SubscriptionModel",
             fields=[
-                ('uuid', models.UUIDField(default=uuid.uuid4, primary_key=True, serialize=False)),
-                ('user_id', models.UUIDField()),
-                ('plan_id', models.UUIDField()),
-                ('status', models.CharField(default='pending', max_length=20)),
-                ('payment_status', models.CharField(default='unpaid', max_length=20)),
-                ('started_at', models.DateTimeField(blank=True, null=True)),
-                ('expires_at', models.DateTimeField(blank=True, null=True)),
-                ('cancelled_at', models.DateTimeField(blank=True, null=True)),
-                ('amount_paid', models.DecimalField(blank=True, decimal_places=2, max_digits=10, null=True)),
-                ('transaction_id', models.CharField(blank=True, db_index=True, max_length=255, null=True)),
-                ('auto_renew', models.BooleanField(default=False)),
-                ('created_at', models.DateTimeField(auto_now_add=True, db_index=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
+                (
+                    "uuid",
+                    models.UUIDField(
+                        default=uuid.uuid4, primary_key=True, serialize=False
+                    ),
+                ),
+                ("user_id", models.UUIDField()),
+                ("plan_id", models.UUIDField()),
+                ("status", models.CharField(default="pending", max_length=20)),
+                ("payment_status", models.CharField(default="unpaid", max_length=20)),
+                ("started_at", models.DateTimeField(blank=True, null=True)),
+                ("expires_at", models.DateTimeField(blank=True, null=True)),
+                ("cancelled_at", models.DateTimeField(blank=True, null=True)),
+                (
+                    "amount_paid",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=10, null=True
+                    ),
+                ),
+                (
+                    "transaction_id",
+                    models.CharField(
+                        blank=True, db_index=True, max_length=255, null=True
+                    ),
+                ),
+                ("auto_renew", models.BooleanField(default=False)),
+                ("created_at", models.DateTimeField(auto_now_add=True, db_index=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
             ],
             options={
-                'db_table': 'Subscriptions',
+                "db_table": "Subscriptions",
             },
         ),
     ]
