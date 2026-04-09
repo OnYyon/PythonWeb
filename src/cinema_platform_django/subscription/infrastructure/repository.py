@@ -2,9 +2,9 @@ from dataclasses import asdict
 from typing import Any
 from uuid import UUID
 
+from src.cinema_platform_django.subscription.domain.entities.plan import SubPlan
 from src.cinema_platform_django.subscription.domain.entities.subscription import (
     PaymentStatus,
-    SubPlan,
     Subscription,
     SubscriptionStatus,
 )
@@ -62,7 +62,7 @@ class DjangoSubRepository(SubRepositoryABC):
         return sub
 
 
-class PlanRepository(PlanRepositoryABC):
+class DjangoPlanRepository(PlanRepositoryABC):
     def to_domain(self, plan: PlanModel) -> SubPlan:
         return SubPlan(
             name=plan.name,

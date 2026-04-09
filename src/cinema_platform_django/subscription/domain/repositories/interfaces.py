@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
 from uuid import UUID
 
+from src.cinema_platform_django.subscription.domain.entities.plan import SubPlan
 from src.cinema_platform_django.subscription.domain.entities.subscription import (
-    SubPlan,
     Subscription,
 )
 

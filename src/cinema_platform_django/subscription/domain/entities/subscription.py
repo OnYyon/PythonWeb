@@ -1,8 +1,9 @@
 from dataclasses import dataclass, field
-from datetime import UTC, datetime, timedelta
-from decimal import Decimal
+from datetime import UTC, datetime
 from enum import Enum
 from uuid import UUID, uuid4
+
+from src.cinema_platform_django.subscription.domain.entities.plan import PaymentStatus
 
 
 class SubscriptionStatus(Enum):
@@ -12,15 +13,6 @@ class SubscriptionStatus(Enum):
     ACTIVE = "active"
     EXPIRED = "expired"
     CANCELLED = "cancelled"
-
-
-class PaymentStatus(Enum):
-    """Все возможные статусы оплатыд"""
-
-    UNPAID = "unpaid"
-    PAID = "paid"
-    FAILED = "failed"
-    REFUNDED = "refunded"
 
 
 @dataclass
@@ -47,15 +39,3 @@ class Subscription:
         self.status = SubscriptionStatus.CANCELLED
         self.cancelled_at = datetime.now(UTC)
         self.auto_renew = False
-
-
-@dataclass
-class SubPlan:
-    name: str
-    price: Decimal
-    plan_id: UUID = field(default_factory=uuid4)
-    duration: timedelta = field(default_factory=lambda: timedelta(days=30))
-
-    def __post_init__(self):
-        if self.price < 0:
-            raise ValueError("Price should be positive")
