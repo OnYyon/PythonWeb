@@ -61,6 +61,14 @@ class DjangoSubRepository(SubRepositoryABC):
         SubscriptionModel.objects.filter(uuid=sub_uuid).update(**data)
         return sub
 
+    def list_for_user(self, user_id: UUID) -> list[Subscription]:
+        qs = SubscriptionModel.objects.filter(user_id=user_id).order_by("-created_at")
+        return [self.to_domain(m) for m in qs]
+
+    def get_all(self) -> list[Subscription]:
+        qs = SubscriptionModel.objects.all().order_by("-created_at")
+        return [self.to_domain(m) for m in qs]
+
 
 class DjangoPlanRepository(PlanRepositoryABC):
     def to_domain(self, plan: PlanModel) -> SubPlan:
@@ -96,3 +104,10 @@ class DjangoPlanRepository(PlanRepositoryABC):
         plan_uuid = data.pop("plan_id")
         PlanModel.objects.filter(uuid=plan_uuid).update(**data)
         return plan
+
+    def get_all(self) -> list[SubPlan]:
+        qs = PlanModel.objects.all()
+        return [self.to_domain(m) for m in qs]
+
+    def delete(self, plan_id: UUID) -> None:
+        PlanModel.objects.filter(uuid=plan_id).delete()

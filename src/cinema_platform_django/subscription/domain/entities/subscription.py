@@ -3,7 +3,14 @@ from datetime import UTC, datetime
 from enum import Enum
 from uuid import UUID, uuid4
 
-from src.cinema_platform_django.subscription.domain.entities.plan import PaymentStatus
+
+class PaymentStatus(Enum):
+    """Все возможные статусы оплатыд"""
+
+    UNPAID = "unpaid"
+    PAID = "paid"
+    FAILED = "failed"
+    REFUNDED = "refunded"
 
 
 class SubscriptionStatus(Enum):

@@ -20,6 +20,12 @@ class SubRepositoryABC(ABC):
     @abstractmethod
     def update(self, sub: Subscription) -> Subscription: ...
 
+    @abstractmethod
+    def list_for_user(self, user_id: UUID) -> list[Subscription]: ...
+
+    @abstractmethod
+    def get_all(self) -> list[Subscription]: ...
+
 
 class PlanRepositoryABC(ABC):
     @abstractmethod
@@ -33,3 +39,9 @@ class PlanRepositoryABC(ABC):
 
     @abstractmethod
     def update(self, plan: SubPlan) -> SubPlan: ...
+
+    @abstractmethod
+    def get_all(self) -> list[SubPlan]: ...
+
+    @abstractmethod
+    def delete(self, plan_id: UUID) -> None: ...
