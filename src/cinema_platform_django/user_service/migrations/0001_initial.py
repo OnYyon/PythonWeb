@@ -5,29 +5,44 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies: list[tuple[str, str]] = []
 
     operations = [
         migrations.CreateModel(
-            name='User',
+            name="User",
             fields=[
-                ('uuid', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('email', models.EmailField(max_length=254, unique=True)),
-                ('username', models.CharField(max_length=150, unique=True)),
-                ('password_hash', models.CharField(max_length=255)),
-                ('role', models.CharField(choices=[('user', 'User')], default='user', max_length=20)),
-                ('full_name', models.CharField(blank=True, max_length=255)),
-                ('phone', models.CharField(blank=True, max_length=20, null=True, unique=True)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
+                (
+                    "uuid",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                ("email", models.EmailField(max_length=254, unique=True)),
+                ("username", models.CharField(max_length=150, unique=True)),
+                ("password_hash", models.CharField(max_length=255)),
+                (
+                    "role",
+                    models.CharField(
+                        choices=[("user", "User")], default="user", max_length=20
+                    ),
+                ),
+                ("full_name", models.CharField(blank=True, max_length=255)),
+                (
+                    "phone",
+                    models.CharField(blank=True, max_length=20, null=True, unique=True),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
             ],
             options={
-                'verbose_name': 'User',
-                'verbose_name_plural': 'Users',
-                'db_table': 'users',
+                "verbose_name": "User",
+                "verbose_name_plural": "Users",
+                "db_table": "users",
             },
         ),
     ]

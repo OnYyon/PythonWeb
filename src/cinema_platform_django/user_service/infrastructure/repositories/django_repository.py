@@ -4,7 +4,6 @@ from user_service.infrastructure.models.user import User
 
 
 class DjangoUserRepository(UserRepositoryABC):
-
     def get(self, *, entity_id: Any) -> User | None:
         return User.objects.filter(uuid=entity_id).first()
 
