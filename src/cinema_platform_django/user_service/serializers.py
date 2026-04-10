@@ -85,19 +85,19 @@ class UserUpdateSerializer(serializers.ModelSerializer):
 
     def validate_email(self, value):
         user = self.instance
-        if User.objects.exclude(uuid=user.uuid).filter(email=value).exists():
+        if user and User.objects.exclude(uuid=user.uuid).filter(email=value).exists():
             raise serializers.ValidationError("User with this email already exists.")
         return value
 
     def validate_username(self, value):
         user = self.instance
-        if User.objects.exclude(uuid=user.uuid).filter(username=value).exists():
+        if user and User.objects.exclude(uuid=user.uuid).filter(username=value).exists():
             raise serializers.ValidationError("User with this username already exists.")
         return value
 
     def validate_phone(self, value):
         user = self.instance
-        if value and User.objects.exclude(uuid=user.uuid).filter(phone=value).exists():
+        if value and user and User.objects.exclude(uuid=user.uuid).filter(phone=value).exists():
             raise serializers.ValidationError("User with this phone already exists.")
         return value
 

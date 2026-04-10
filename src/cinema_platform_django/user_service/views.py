@@ -61,6 +61,9 @@ def user_collection_view(request):
     users = User.objects.all().order_by("-created_at")
     paginator = UserPagination()
     page = paginator.paginate_queryset(users, request)
+    if page is None:
+        serializer = UserListSerializer(users, many=True)
+        return Response(serializer.data)
     serializer = UserListSerializer(page, many=True)
     return paginator.get_paginated_response(serializer.data)
 
