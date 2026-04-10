@@ -1,6 +1,7 @@
 from typing import Any
-from user_service.domain.repositories.interfaces import UserRepositoryABC
-from user_service.infrastructure.models.user import User
+
+from ...domain.repositories.interfaces import UserRepositoryABC
+from ..models.user import User
 
 
 class DjangoUserRepository(UserRepositoryABC):
