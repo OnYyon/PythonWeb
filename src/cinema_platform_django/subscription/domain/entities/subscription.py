@@ -36,11 +36,17 @@ class Subscription:
     auto_renew: bool = False
     created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
 
-    def activate(self):
+    def activate(self, duration: timedelta):
+        if self.status == SubscriptionStatus.ACTIVE:
+            return
+        # TODO: Add check to ensure payment_status == PaymentStatus.PAID before activating
         if self.status != SubscriptionStatus.PENDING:
-            raise ValueError("")
+            raise ValueError(
+                f"Cannot activate subscription with status {self.status.value}"
+            )
         self.status = SubscriptionStatus.ACTIVE
         self.started_at = datetime.now(UTC)
+        self.expires_at = self.started_at + duration
 
     def cancel(self):
         self.status = SubscriptionStatus.CANCELLED

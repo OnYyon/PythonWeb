@@ -15,6 +15,10 @@ class PlanService:
     def create(
         self, name: str, price: Decimal, duration: timedelta | None = None
     ) -> SubPlan:
+        existing_plan = self.plan_repo.get_by_name(name)
+        if existing_plan:
+            raise ValueError("Plan with this name already exists")
+
         if duration is None:
             plan = SubPlan(name=name, price=price)
         else:

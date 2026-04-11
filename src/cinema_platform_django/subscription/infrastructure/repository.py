@@ -39,11 +39,25 @@ class DjangoSubRepository(SubRepositoryABC):
             return None
 
     def get_active_for_user(self, user_id: UUID) -> Subscription | None:
-        try:
-            queryset = SubscriptionModel.objects.get(user_id=user_id)
-            return self.to_domain(queryset)
-        except SubscriptionModel.DoesNotExist:
+        queryset = (
+            SubscriptionModel.objects.filter(
+                user_id=user_id, status=SubscriptionStatus.ACTIVE.value
+            )
+            .order_by("-created_at")
+            .first()
+        )
+
+        if not queryset:
+            queryset = (
+                SubscriptionModel.objects.filter(user_id=user_id)
+                .order_by("-created_at")
+                .first()
+            )
+
+        if not queryset:
             return None
+
+        return self.to_domain(queryset)
 
     def create(self, sub: Subscription) -> Subscription:
         data: dict[str, Any] = asdict(sub)
@@ -106,8 +120,8 @@ class DjangoPlanRepository(PlanRepositoryABC):
         return plan
 
     def get_all(self) -> list[SubPlan]:
-        qs = PlanModel.objects.all()
+        qs = PlanModel.objects.filter(is_active=True)
         return [self.to_domain(m) for m in qs]
 
     def delete(self, plan_id: UUID) -> None:
-        PlanModel.objects.filter(uuid=plan_id).delete()
+        PlanModel.objects.filter(uuid=plan_id).update(is_active=False)

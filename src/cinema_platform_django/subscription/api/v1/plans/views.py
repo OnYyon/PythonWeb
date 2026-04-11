@@ -63,7 +63,10 @@ class AdminPlanViewSet(viewsets.ViewSet):
         name = serializer.validated_data["name"]
         price = serializer.validated_data["price"]
         duration = serializer.validated_data.get("duration")
-        plan = service.create(name=name, price=price, duration=duration)
+        try:
+            plan = service.create(name=name, price=price, duration=duration)
+        except ValueError as e:
+            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         return Response(PlanSerializerDTO(plan).data, status=status.HTTP_201_CREATED)
 
     def update(self, request, pk=None):

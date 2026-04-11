@@ -9,6 +9,7 @@ from src.cinema_platform_django.subscription.domain.entities.subscription import
 
 class SubscriptionCreateSerializer(serializers.Serializer):
     plan_id = serializers.UUIDField()
+    auto_renew = serializers.BooleanField(required=False, default=False)
 
 
 # TODO: use serializers.ModelSerializer
