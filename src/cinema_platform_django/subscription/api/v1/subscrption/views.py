@@ -18,11 +18,11 @@ class SubscrptionViews(viewsets.ViewSet):
         """POST api/v1/subscriptions/"""
         serializer = SubscriptionCreateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-
         service = get_subscription_service()
         try:
             sub = service.create(
-                user_id=request.user.id,
+                # TODO: use request.user.id when we will do RBAC && auth service
+                user_id=request.headers.get("X-User-Id"),
                 plan_id=serializer.validated_data["plan_id"],
             )
         except ValueError:
@@ -53,6 +53,7 @@ class SubscrptionViews(viewsets.ViewSet):
         """GET api/v1/subscriptions/me/"""
         service = get_subscription_service()
         sub = service.sub_repo.get_active_for_user(request.user.id)
+        print(sub)
         if not sub:
             return Response(status=status.HTTP_404_NOT_FOUND)
         return Response(SubscrptionSerializer(sub).data)
@@ -98,8 +99,8 @@ class SubscrptionViews(viewsets.ViewSet):
         try:
             sub = service.renew(UUID(sub_id))
             return Response(SubscrptionSerializer(sub).data)
-        except ValueError, TypeError:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+        except (ValueError, TypeError) as e:
+            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=True, methods=["get"])
     def status(self, request, pk=None) -> Response:

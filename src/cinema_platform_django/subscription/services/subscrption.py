@@ -1,6 +1,7 @@
 from uuid import UUID
 
 from src.cinema_platform_django.subscription.domain.entities.subscription import (
+    PaymentStatus,
     Subscription,
 )
 from src.cinema_platform_django.subscription.domain.repositories.interfaces import (
@@ -51,5 +52,21 @@ class SubscrptionService:
         sub = self.sub_repo.get_by_id(sub_id)
         if not sub:
             raise ValueError("Not found")
-        # Для renew здесь должна быть доменная логика продления
+
+        plan = self.plan_repo.get_by_id(sub.plan_id)
+        if not plan:
+            raise ValueError("Plan not found")
+
+        # Интеграция с Payment Service для списания денег
+        # Пример: payment_service.charge(sub.user_id, plan.price)
+        # Если оплата не проходит, нужно будет обновлять статус:
+        # sub.payment_status = PaymentStatus.FAILED
+        # self.sub_repo.update(sub)
+        # raise ValueError("Payment failed")
+
+        is_renewed = sub.renew(plan.duration)
+        if not is_renewed:
+            raise ValueError("Cannot renew this subscription (auto_renew is off)")
+
+        sub.payment_status = PaymentStatus.PAID
         return self.sub_repo.update(sub)

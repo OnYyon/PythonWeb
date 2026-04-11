@@ -1,11 +1,11 @@
 from dataclasses import dataclass, field
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from enum import Enum
 from uuid import UUID, uuid4
 
 
 class PaymentStatus(Enum):
-    """Все возможные статусы оплатыд"""
+    """Все возможные статусы оплаты"""
 
     UNPAID = "unpaid"
     PAID = "paid"
@@ -46,3 +46,19 @@ class Subscription:
         self.status = SubscriptionStatus.CANCELLED
         self.cancelled_at = datetime.now(UTC)
         self.auto_renew = False
+
+    def renew(self, duration: timedelta) -> bool:
+        if not self.auto_renew:
+            return False
+
+        now = datetime.now(UTC)
+
+        if self.expires_at and self.expires_at > now:
+            self.expires_at += duration
+        else:
+            self.expires_at = now + duration
+
+        if self.status == SubscriptionStatus.EXPIRED:
+            self.status = SubscriptionStatus.ACTIVE
+
+        return True

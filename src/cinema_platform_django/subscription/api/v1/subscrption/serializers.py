@@ -11,6 +11,7 @@ class SubscriptionCreateSerializer(serializers.Serializer):
     plan_id = serializers.UUIDField()
 
 
+# TODO: use serializers.ModelSerializer
 class SubscrptionSerializer(serializers.Serializer):
     """
     Превращает доменный Subscription (dataclass) в JSON-словар
