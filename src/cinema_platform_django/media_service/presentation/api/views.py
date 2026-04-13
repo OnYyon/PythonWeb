@@ -1,8 +1,9 @@
 import uuid
 from rest_framework import viewsets, status
 from rest_framework.response import Response
+
 from media_service.infrastructure.repositories.django_repository import DjangoMediaRepository
-from .serializers import (
+from media_service.presentation.api.serializers import (  # type: ignore
     FilmCreateUpdateSerializer,
     GenreCreateUpdateSerializer,
     WatchlistAddSerializer
@@ -32,8 +33,8 @@ class FilmViewSet(viewsets.ViewSet):
         }
         return Response(response_data, status=status.HTTP_200_OK)
 
-    def retrieve(self, request, pk=None):
-        film = self.repository.get_film_by_uuid(pk)
+    def retrieve(self, request, pk: str):
+        film = self.repository.get_film_by_uuid(uuid.UUID(pk))
         if not film:
             return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
         return Response(film, status=status.HTTP_200_OK)
@@ -44,14 +45,14 @@ class FilmViewSet(viewsets.ViewSet):
         film = self.repository.create_film(serializer.validated_data)
         return Response(film, status=status.HTTP_201_CREATED)
 
-    def partial_update(self, request, pk=None):
+    def partial_update(self, request, pk: str):
         serializer = FilmCreateUpdateSerializer(data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
-        film = self.repository.update_film(pk, serializer.validated_data)
+        film = self.repository.update_film(uuid.UUID(pk), serializer.validated_data)
         return Response(film, status=status.HTTP_200_OK)
 
-    def destroy(self, request, pk=None):
-        self.repository.delete_film(pk)
+    def destroy(self, request, pk: str):
+        self.repository.delete_film(uuid.UUID(pk))
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
@@ -69,14 +70,14 @@ class GenreViewSet(viewsets.ViewSet):
         genre = self.repository.create_genre(serializer.validated_data)
         return Response(genre, status=status.HTTP_201_CREATED)
 
-    def partial_update(self, request, pk=None):
+    def partial_update(self, request, pk: str):
         serializer = GenreCreateUpdateSerializer(data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
-        genre = self.repository.update_genre(pk, serializer.validated_data)
+        genre = self.repository.update_genre(uuid.UUID(pk), serializer.validated_data)
         return Response(genre, status=status.HTTP_200_OK)
 
-    def destroy(self, request, pk=None):
-        self.repository.delete_genre(pk)
+    def destroy(self, request, pk: str):
+        self.repository.delete_genre(uuid.UUID(pk))
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
@@ -84,7 +85,7 @@ class WatchlistViewSet(viewsets.ViewSet):
     """Ручки для работы со списком просмотра (Watchlist)"""
     repository = DjangoMediaRepository()
 
-    def _get_user_uuid(self, request):
+    def _get_user_uuid(self, request) -> uuid.UUID:
         return uuid.UUID("00000000-0000-0000-0000-000000000001")
 
     def list(self, request):
@@ -109,6 +110,6 @@ class WatchlistViewSet(viewsets.ViewSet):
         result = self.repository.add_to_watchlist(user_uuid, serializer.validated_data['film_uuid'])
         return Response(result, status=status.HTTP_201_CREATED)
 
-    def destroy(self, request, pk=None):
-        self.repository.remove_from_watchlist(pk)
+    def destroy(self, request, pk: str):
+        self.repository.remove_from_watchlist(uuid.UUID(pk))
         return Response(status=status.HTTP_204_NO_CONTENT)
