@@ -34,7 +34,10 @@ class DjangoSubRepository(SubRepositoryABC):
     def get_by_id(self, sub_id: UUID) -> Subscription | None:
         try:
             queryset = SubscriptionModel.objects.get(uuid=sub_id)
-            return self.to_domain(queryset)
+            sub = self.to_domain(queryset)
+            if sub.check_expiration():
+                self.update(sub)
+            return sub
         except SubscriptionModel.DoesNotExist:
             return None
 
@@ -57,7 +60,11 @@ class DjangoSubRepository(SubRepositoryABC):
         if not queryset:
             return None
 
-        return self.to_domain(queryset)
+        sub = self.to_domain(queryset)
+        if sub.check_expiration():
+            self.update(sub)
+
+        return sub
 
     def create(self, sub: Subscription) -> Subscription:
         data: dict[str, Any] = asdict(sub)
@@ -77,11 +84,23 @@ class DjangoSubRepository(SubRepositoryABC):
 
     def list_for_user(self, user_id: UUID) -> list[Subscription]:
         qs = SubscriptionModel.objects.filter(user_id=user_id).order_by("-created_at")
-        return [self.to_domain(m) for m in qs]
+        subs = []
+        for m in qs:
+            sub = self.to_domain(m)
+            if sub.check_expiration():
+                self.update(sub)
+            subs.append(sub)
+        return subs
 
     def get_all(self) -> list[Subscription]:
         qs = SubscriptionModel.objects.all().order_by("-created_at")
-        return [self.to_domain(m) for m in qs]
+        subs = []
+        for m in qs:
+            sub = self.to_domain(m)
+            if sub.check_expiration():
+                self.update(sub)
+            subs.append(sub)
+        return subs
 
 
 class DjangoPlanRepository(PlanRepositoryABC):

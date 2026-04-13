@@ -38,6 +38,7 @@ class SubscrptionViews(viewsets.ViewSet):
                 plan_id=serializer.validated_data["plan_id"],
                 auto_renew=serializer.validated_data["auto_renew"],
             )
+            print(sub)
         except ValueError as e:
             return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 

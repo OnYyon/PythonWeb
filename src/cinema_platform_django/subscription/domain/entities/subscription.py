@@ -68,3 +68,10 @@ class Subscription:
             self.status = SubscriptionStatus.ACTIVE
 
         return True
+
+    def check_expiration(self) -> bool:
+        if self.status == SubscriptionStatus.ACTIVE and self.expires_at:
+            if datetime.now(UTC) >= self.expires_at:
+                self.status = SubscriptionStatus.EXPIRED
+                return True
+        return False
