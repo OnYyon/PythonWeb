@@ -4,25 +4,24 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('subscription', '0001_initial'),
+        ("subscription", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='planmodel',
-            name='is_active',
+            model_name="planmodel",
+            name="is_active",
             field=models.BooleanField(default=True),
         ),
         migrations.AlterField(
-            model_name='planmodel',
-            name='name',
+            model_name="planmodel",
+            name="name",
             field=models.CharField(unique=True),
         ),
         migrations.AlterField(
-            model_name='subscriptionmodel',
-            name='transaction_id',
+            model_name="subscriptionmodel",
+            name="transaction_id",
             field=models.CharField(blank=True, max_length=255, null=True),
         ),
     ]
