@@ -9,7 +9,7 @@
 ## Что уже есть
 
 - есть ручки для `user serivce`
-- есть ручки для `media service`
+- есть ручки для `media service` (на момент коммита в отдельной ветки)
 - есть ручки для `subscription service`
 - есть django admin
 
@@ -25,12 +25,7 @@
 docker compose up -d
 ```
 
-Применения миграциий
-```bash
-make miagrate
-```
-
-Запуск сервера django(видимо второй терминал)
+Запуск сервера django и применения миграций
 ```bash
 make run
 ```

@@ -8,5 +8,5 @@ lint:
 test:
 	uv run src/cinema_platform_django/manage.py test
 
-run:
+run: migrate
 	uv run src/cinema_platform_django/manage.py runserver
