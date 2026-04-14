@@ -1,7 +1,40 @@
-# template-python
+# Subscription
 
-## Tools
+## Navigation
 
-- `Uv` - manage enviroment
-- `Ty` - type checker
-- `Ruff` - linter
+- [Что уже есть](#что-уже-есть)
+- [Чего нету](#чего-нету)
+- [Быстрый старт](#бытсрый-старт)
+
+## Что уже есть
+
+- есть ручки для `user serivce`
+- есть ручки для `media service`
+- есть ручки для `subscription service`
+- есть django admin
+
+## Чего нету
+
+- нет полной интеграции между `user service` с `subscription service` поэтмоу не проверки что такой uuid вообще есть
+- упрощения связанные с авториазций(для `subscription service` нужен заголов X-User-Id, препологаю что будет ставиться auth servvices или gateway - пока не понятно)
+
+## Бытсрый старт
+
+Запуск дб:
+```bash
+docker compose up -d
+```
+
+Применения миграциий
+```bash
+make miagrate
+```
+
+Запуск сервера django(видимо второй терминал)
+```bash
+make run
+```
+
+## Доки
+
+Введуться странички на вики. Там есть примеры запросов и описание моделей бд
