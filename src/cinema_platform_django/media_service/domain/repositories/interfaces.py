@@ -6,7 +6,9 @@ from typing import Any, Dict, List, Optional
 class IMediaRepository(ABC):
     # Films
     @abstractmethod
-    def get_films(self, filters: Dict[str, Any], page: int, page_size: int) -> Dict[str, Any]:
+    def get_films(
+        self, filters: Dict[str, Any], page: int, page_size: int
+    ) -> Dict[str, Any]:
         """Возвращает список фильмов с учетом фильтров и пагинации"""
         pass
 
@@ -42,7 +44,9 @@ class IMediaRepository(ABC):
         pass
 
     @abstractmethod
-    def update_genre(self, genre_uuid: uuid.UUID, data: Dict[str, Any]) -> Dict[str, Any]:
+    def update_genre(
+        self, genre_uuid: uuid.UUID, data: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """Обновляет жанр"""
         pass
 
@@ -53,12 +57,16 @@ class IMediaRepository(ABC):
 
     # Watchlist
     @abstractmethod
-    def get_watchlist(self, user_uuid: uuid.UUID, page: int, page_size: int) -> Dict[str, Any]:
+    def get_watchlist(
+        self, user_uuid: uuid.UUID, page: int, page_size: int
+    ) -> Dict[str, Any]:
         """Возвращает список просмотра конкретного пользователя"""
         pass
 
     @abstractmethod
-    def add_to_watchlist(self, user_uuid: uuid.UUID, film_uuid: uuid.UUID) -> Dict[str, Any]:
+    def add_to_watchlist(
+        self, user_uuid: uuid.UUID, film_uuid: uuid.UUID
+    ) -> Dict[str, Any]:
         """Добавляет фильм в список просмотра пользователя"""
         pass
 

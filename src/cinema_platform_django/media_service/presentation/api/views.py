@@ -6,30 +6,34 @@ from ...infrastructure.repositories.django_repository import DjangoMediaReposito
 from ...presentation.api.serializer import (
     FilmCreateUpdateSerializer,
     GenreCreateUpdateSerializer,
-    WatchlistAddSerializer
+    WatchlistAddSerializer,
 )
 
 
 class FilmViewSet(viewsets.ViewSet):
     """Ручки для работы с фильмами"""
+
     repository = DjangoMediaRepository()
 
     def list(self, request):
-        page = int(request.query_params.get('page', 1))
-        page_size = int(request.query_params.get('page_size', 10))
+        page = int(request.query_params.get("page", 1))
+        page_size = int(request.query_params.get("page_size", 10))
         filters = {
-            'genre': request.query_params.get('genre'),
-            'search': request.query_params.get('search'),
-            'ordering': request.query_params.get('ordering'),
+            "genre": request.query_params.get("genre"),
+            "search": request.query_params.get("search"),
+            "ordering": request.query_params.get("ordering"),
         }
 
         data = self.repository.get_films(filters, page, page_size)
         response_data = {
             "count": data["count"],
-            "next": f"/api/v1/media/film/?page={page + 1}&page_size={page_size}" if data[
-                                                                                        "count"] > page * page_size else None,
-            "previous": f"/api/v1/media/film/?page={page - 1}&page_size={page_size}" if page > 1 else None,
-            "results": data["results"]
+            "next": f"/api/v1/media/film/?page={page + 1}&page_size={page_size}"
+            if data["count"] > page * page_size
+            else None,
+            "previous": f"/api/v1/media/film/?page={page - 1}&page_size={page_size}"
+            if page > 1
+            else None,
+            "results": data["results"],
         }
         return Response(response_data, status=status.HTTP_200_OK)
 
@@ -58,6 +62,7 @@ class FilmViewSet(viewsets.ViewSet):
 
 class GenreViewSet(viewsets.ViewSet):
     """Ручки для работы с жанрами"""
+
     repository = DjangoMediaRepository()
 
     def list(self, request):
@@ -83,6 +88,7 @@ class GenreViewSet(viewsets.ViewSet):
 
 class WatchlistViewSet(viewsets.ViewSet):
     """Ручки для работы со списком просмотра (Watchlist)"""
+
     repository = DjangoMediaRepository()
 
     def _get_user_uuid(self, request) -> uuid.UUID:
@@ -90,16 +96,19 @@ class WatchlistViewSet(viewsets.ViewSet):
 
     def list(self, request):
         user_uuid = self._get_user_uuid(request)
-        page = int(request.query_params.get('page', 1))
-        page_size = int(request.query_params.get('page_size', 10))
+        page = int(request.query_params.get("page", 1))
+        page_size = int(request.query_params.get("page_size", 10))
         data = self.repository.get_watchlist(user_uuid, page, page_size)
 
         response_data = {
             "count": data["count"],
-            "next": f"/api/v1/media/watchlist/?page={page + 1}&page_size={page_size}" if data[
-                                                                                             "count"] > page * page_size else None,
-            "previous": f"/api/v1/media/watchlist/?page={page - 1}&page_size={page_size}" if page > 1 else None,
-            "results": data["results"]
+            "next": f"/api/v1/media/watchlist/?page={page + 1}&page_size={page_size}"
+            if data["count"] > page * page_size
+            else None,
+            "previous": f"/api/v1/media/watchlist/?page={page - 1}&page_size={page_size}"
+            if page > 1
+            else None,
+            "results": data["results"],
         }
         return Response(response_data, status=status.HTTP_200_OK)
 
@@ -107,7 +116,9 @@ class WatchlistViewSet(viewsets.ViewSet):
         serializer = WatchlistAddSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user_uuid = self._get_user_uuid(request)
-        result = self.repository.add_to_watchlist(user_uuid, serializer.validated_data['film_uuid'])
+        result = self.repository.add_to_watchlist(
+            user_uuid, serializer.validated_data["film_uuid"]
+        )
         return Response(result, status=status.HTTP_201_CREATED)
 
     def destroy(self, request, pk: str):
