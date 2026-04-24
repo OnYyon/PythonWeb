@@ -1,8 +1,8 @@
 import uuid
 from typing import Any, Dict, List, Optional
 from django.core.paginator import Paginator
-from media_service.domain.repositories.interfaces import IMediaRepository
-from media_service.infrastructure.models import Film, Genre, Watchlist
+from ...domain.repositories.interfaces import IMediaRepository
+from ...infrastructure.models import Film, Genre, Watchlist
 
 
 class DjangoMediaRepository(IMediaRepository):

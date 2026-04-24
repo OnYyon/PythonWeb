@@ -2,8 +2,8 @@ import uuid
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 
-from media_service.infrastructure.repositories.django_repository import DjangoMediaRepository
-from media_service.presentation.api.serializers import (  # type: ignore
+from ...infrastructure.repositories.django_repository import DjangoMediaRepository
+from ...presentation.api.serializer import (
     FilmCreateUpdateSerializer,
     GenreCreateUpdateSerializer,
     WatchlistAddSerializer
