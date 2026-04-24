@@ -2,4 +2,6 @@ from django.apps import AppConfig
 
 
 class MediaServiceConfig(AppConfig):
-    name = "media_service"
+    default_auto_field = "django.db.models.BigAutoField"
+    name = "src.cinema_platform_django.media_service"
+    label = "media_service"
