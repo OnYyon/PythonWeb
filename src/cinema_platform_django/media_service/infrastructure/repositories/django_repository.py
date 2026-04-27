@@ -1,6 +1,8 @@
 import uuid
 from typing import Any, Dict, List, Optional
+
 from django.core.paginator import Paginator
+
 from ...domain.repositories.interfaces import IMediaRepository
 from ...infrastructure.models import Film, Genre, Watchlist
 

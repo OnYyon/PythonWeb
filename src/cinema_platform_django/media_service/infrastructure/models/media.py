@@ -1,4 +1,5 @@
 import uuid
+
 from django.db import models
 
 
@@ -8,6 +9,7 @@ class Genre(models.Model):
     description = models.TextField(null=True, blank=True)
 
     class Meta:
+        app_label = "media_service"
         db_table = "genres"
 
     def __str__(self):
@@ -28,6 +30,7 @@ class Film(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
+        app_label = "media_service"
         db_table = "films"
 
     def __str__(self):
@@ -43,6 +46,7 @@ class Watchlist(models.Model):
     added_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
+        app_label = "media_service"
         db_table = "watchlist"
         unique_together = ("user_uuid", "film")
 
