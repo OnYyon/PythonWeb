@@ -3,8 +3,8 @@ from rest_framework.decorators import api_view
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 
-from .infrastructure.models.user import User
-from .serializers import (
+from src.cinema_platform_django.user_service.infrastructure.models.user import User
+from src.cinema_platform_django.user_service.serializers import (
     UserCreateSerializer,
     UserDetailSerializer,
     UserListSerializer,

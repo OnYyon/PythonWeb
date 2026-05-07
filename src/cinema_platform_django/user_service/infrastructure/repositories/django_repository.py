@@ -1,7 +1,9 @@
 from typing import Any
 
-from ...domain.repositories.interfaces import UserRepositoryABC
-from ..models.user import User
+from src.cinema_platform_django.user_service.domain.repositories.interfaces import (
+    UserRepositoryABC,
+)
+from src.cinema_platform_django.user_service.infrastructure.models.user import User
 
 
 class DjangoUserRepository(UserRepositoryABC):

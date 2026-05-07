@@ -1,6 +1,7 @@
 from django.contrib.auth.hashers import make_password
 from rest_framework import serializers
-from .infrastructure.models.user import User
+
+from src.cinema_platform_django.user_service.infrastructure.models.user import User
 
 
 class UserCreateSerializer(serializers.ModelSerializer):

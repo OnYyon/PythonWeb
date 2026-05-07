@@ -1,5 +1,9 @@
 from django.urls import path
-from .views import user_collection_view, user_detail_media_view
+
+from src.cinema_platform_django.user_service.views import (
+    user_collection_view,
+    user_detail_media_view,
+)
 
 urlpatterns = [
     path("user/", user_collection_view, name="user-collection"),
