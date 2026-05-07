@@ -1,6 +1,6 @@
 from django.urls import path
 
-from src.cinema_platform_django.user_service.views import (
+from src.cinema_platform_django.user_service.api.views import (
     user_collection_view,
     user_detail_media_view,
 )
