@@ -8,9 +8,15 @@ from src.cinema_platform_django.subscription.domain.repositories.interfaces impo
     PlanRepositoryABC,
     SubRepositoryABC,
 )
+from src.cinema_platform_django.subscription.services.exceptions import (
+    PlanNotFoundError,
+    SubscriptionAlreadyActiveError,
+    SubscriptionNotFoundError,
+    SubscriptionRenewalNotAllowedError,
+)
 
 
-class SubscrptionService:
+class SubscriptionService:
     def __init__(
         self, sub_repo: SubRepositoryABC, plan_repo: PlanRepositoryABC
     ) -> None:
@@ -22,17 +28,23 @@ class SubscrptionService:
     ) -> Subscription:
         active_sub = self.sub_repo.get_active_for_user(user_id)
         if active_sub:
-            raise ValueError("User already has an active subscription")
+            raise SubscriptionAlreadyActiveError(user_id)
 
         plan = self.plan_repo.get_by_id(plan_id)
         if not plan:
-            raise ValueError("Plan not found")
+            raise PlanNotFoundError(plan_id)
 
         sub = Subscription(user_id, plan_id, auto_renew=auto_renew)
         return self.sub_repo.create(sub)
 
-    def get_by_id(self, sub_id: UUID) -> Subscription | None:
-        return self.sub_repo.get_by_id(sub_id)
+    def get_by_id(self, sub_id: UUID) -> Subscription:
+        sub = self.sub_repo.get_by_id(sub_id)
+        if not sub:
+            raise SubscriptionNotFoundError(sub_id)
+        return sub
+
+    def get_active_for_user(self, user_id: UUID) -> Subscription | None:
+        return self.sub_repo.get_active_for_user(user_id)
 
     def get_user_history(self, user_id: UUID) -> list[Subscription]:
         return self.sub_repo.list_for_user(user_id)
@@ -43,11 +55,11 @@ class SubscrptionService:
     def activate(self, sub_id: UUID) -> Subscription:
         sub = self.sub_repo.get_by_id(sub_id)
         if not sub:
-            raise ValueError("Not found")
+            raise SubscriptionNotFoundError(sub_id)
 
         plan = self.plan_repo.get_by_id(sub.plan_id)
         if not plan:
-            raise ValueError("Plan not found")
+            raise PlanNotFoundError(sub.plan_id)
 
         sub.activate(plan.duration)
         return self.sub_repo.update(sub)
@@ -55,22 +67,22 @@ class SubscrptionService:
     def cancel(self, sub_id: UUID) -> Subscription:
         sub = self.sub_repo.get_by_id(sub_id)
         if not sub:
-            raise ValueError("Not found")
+            raise SubscriptionNotFoundError(sub_id)
         sub.cancel()
         return self.sub_repo.update(sub)
 
     def renew(self, sub_id: UUID) -> Subscription:
         sub = self.sub_repo.get_by_id(sub_id)
         if not sub:
-            raise ValueError("Not found")
+            raise SubscriptionNotFoundError(sub_id)
 
         plan = self.plan_repo.get_by_id(sub.plan_id)
         if not plan:
-            raise ValueError("Plan not found")
+            raise PlanNotFoundError(sub.plan_id)
 
         is_renewed = sub.renew(plan.duration)
         if not is_renewed:
-            raise ValueError("Cannot renew this subscription (auto_renew is off)")
+            raise SubscriptionRenewalNotAllowedError(sub_id)
 
         sub.payment_status = PaymentStatus.PAID
         return self.sub_repo.update(sub)

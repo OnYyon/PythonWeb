@@ -13,7 +13,7 @@ class SubscriptionCreateSerializer(serializers.Serializer):
 
 
 # TODO: use serializers.ModelSerializer
-class SubscrptionSerializer(serializers.Serializer):
+class SubscriptionSerializer(serializers.Serializer):
     """
     Превращает доменный Subscription (dataclass) в JSON-словар
     Используется для ответа на GET /subscriptions/{id}/ и для списков.
