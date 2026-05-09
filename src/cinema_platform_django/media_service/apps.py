@@ -5,3 +5,4 @@ class MediaServiceConfig(AppConfig):
     default_auto_field = "django.db.models.BigAutoField"
     name = "src.cinema_platform_django.media_service"
     label = "media_service"
+    
