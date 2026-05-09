@@ -24,6 +24,6 @@ urlpatterns = [
     path("api/v1/", include("src.cinema_platform_django.user_service.urls")),
     path(
         "api/v1/media/",
-        include("src.cinema_platform_django.media_service1.presentation.api.urls"),
+        include("src.cinema_platform_django.media_service.api.urls"),
     ),
 ]

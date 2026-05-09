@@ -1,5 +1,5 @@
 INSTALLED_APPS = [
-    "src.cinema_platform_django.media_service1.apps.MediaServiceConfig",
+    "src.cinema_platform_django.media_service.apps.MediaServiceConfig",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
