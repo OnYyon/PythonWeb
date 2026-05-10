@@ -21,5 +21,9 @@ from django.urls import include, path
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/v1/", include("src.cinema_platform_django.subscription.urls")),
-    path("api/v1/", include("user_service.urls")),
+    path("api/v1/", include("src.cinema_platform_django.user_service.urls")),
+    path(
+        "api/v1/media/",
+        include("src.cinema_platform_django.media_service.presentation.api.urls"),
+    ),
 ]

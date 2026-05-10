@@ -4,11 +4,16 @@ from rest_framework import status, viewsets
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
+from src.cinema_platform_django.subscription.api.v1.errors import make_error
 from src.cinema_platform_django.subscription.api.v1.plans.serializers import (
     PlanCreateSerializerRequestDTO,
     PlanSerializerDTO,
 )
 from src.cinema_platform_django.subscription.dependencies import get_plan_service
+from src.cinema_platform_django.subscription.services.exceptions import (
+    PlanAlreadyExistsError,
+    PlanNotFoundError,
+)
 
 
 class PublicPlanViewSet(viewsets.ViewSet):
@@ -25,12 +30,13 @@ class PublicPlanViewSet(viewsets.ViewSet):
         try:
             plan_id = UUID(pk)
         except ValueError, TypeError:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+            return make_error(status.HTTP_400_BAD_REQUEST, "invalid UUID format")
 
         service = get_plan_service()
-        plan = service.get_by_id(plan_id)
-        if not plan:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+        try:
+            plan = service.get_by_id(plan_id)
+        except PlanNotFoundError:
+            return make_error(status.HTTP_404_NOT_FOUND, "plan not found")
         return Response(PlanSerializerDTO(plan).data)
 
 
@@ -46,12 +52,13 @@ class AdminPlanViewSet(viewsets.ViewSet):
         try:
             plan_id = UUID(pk)
         except ValueError, TypeError:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+            return make_error(status.HTTP_400_BAD_REQUEST, "invalid UUID format")
 
         service = get_plan_service()
-        plan = service.get_by_id(plan_id)
-        if not plan:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+        try:
+            plan = service.get_by_id(plan_id)
+        except PlanNotFoundError:
+            return make_error(status.HTTP_404_NOT_FOUND, "plan not found")
         return Response(PlanSerializerDTO(plan).data)
 
     def create(self, request):
@@ -65,8 +72,8 @@ class AdminPlanViewSet(viewsets.ViewSet):
         duration = serializer.validated_data.get("duration")
         try:
             plan = service.create(name=name, price=price, duration=duration)
-        except ValueError as e:
-            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        except PlanAlreadyExistsError:
+            return make_error(status.HTTP_409_CONFLICT, "plan already exists")
         return Response(PlanSerializerDTO(plan).data, status=status.HTTP_201_CREATED)
 
     def update(self, request, pk=None):
@@ -76,8 +83,11 @@ class AdminPlanViewSet(viewsets.ViewSet):
         try:
             plan_id = UUID(pk)
         except ValueError, TypeError:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+            return make_error(status.HTTP_400_BAD_REQUEST, "invalid UUID format")
 
         service = get_plan_service()
-        service.delete(plan_id)
+        try:
+            service.delete(plan_id)
+        except PlanNotFoundError:
+            return make_error(status.HTTP_409_CONFLICT, "plan already exists")
         return Response(status=status.HTTP_204_NO_CONTENT)

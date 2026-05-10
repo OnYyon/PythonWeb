@@ -2,7 +2,7 @@ name: Python CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, stage]
     tags: ["v*"]
   pull_request:
     branches: [main, stage]

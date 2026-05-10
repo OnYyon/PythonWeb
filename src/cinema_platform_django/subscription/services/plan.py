@@ -6,6 +6,10 @@ from src.cinema_platform_django.subscription.domain.entities.plan import SubPlan
 from src.cinema_platform_django.subscription.domain.repositories.interfaces import (
     PlanRepositoryABC,
 )
+from src.cinema_platform_django.subscription.services.exceptions import (
+    PlanAlreadyExistsError,
+    PlanNotFoundError,
+)
 
 
 class PlanService:
@@ -17,7 +21,7 @@ class PlanService:
     ) -> SubPlan:
         existing_plan = self.plan_repo.get_by_name(name)
         if existing_plan:
-            raise ValueError("Plan with this name already exists")
+            raise PlanAlreadyExistsError(name)
 
         if duration is None:
             plan = SubPlan(name=name, price=price)
@@ -29,8 +33,12 @@ class PlanService:
     def get_all(self) -> list[SubPlan]:
         return self.plan_repo.get_all()
 
-    def get_by_id(self, plan_id: UUID) -> SubPlan | None:
-        return self.plan_repo.get_by_id(plan_id)
+    def get_by_id(self, plan_id: UUID) -> SubPlan:
+        plan = self.plan_repo.get_by_id(plan_id)
+        if not plan:
+            raise PlanNotFoundError(plan_id)
+        return plan
 
     def delete(self, plan_id: UUID) -> None:
+        self.get_by_id(plan_id)
         self.plan_repo.delete(plan_id)
