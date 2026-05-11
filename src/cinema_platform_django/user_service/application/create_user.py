@@ -33,4 +33,3 @@ class CreateUserUseCase:
             full_name=command.full_name,
             phone=command.phone,
         )
-

@@ -16,4 +16,3 @@ class GetUserUseCase:
         if user is None:
             raise UserNotFoundError(user_id)
         return user
-

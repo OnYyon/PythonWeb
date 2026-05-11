@@ -1,6 +1,9 @@
 from uuid import UUID
 
-from src.cinema_platform_django.user_service.application.dto import UNSET, UpdateUserCommand
+from src.cinema_platform_django.user_service.application.dto import (
+    UNSET,
+    UpdateUserCommand,
+)
 from src.cinema_platform_django.user_service.application.user_uniqueness import (
     ensure_unique_user_fields,
 )

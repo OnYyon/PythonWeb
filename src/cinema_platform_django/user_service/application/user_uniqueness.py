@@ -30,4 +30,3 @@ def ensure_unique_user_fields(
         existing = repository.get_by_phone(phone=phone)
         if existing is not None and existing.uuid != exclude_user_id:
             raise UserAlreadyExistsError("phone")
-

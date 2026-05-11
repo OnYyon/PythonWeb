@@ -12,4 +12,3 @@ class ListUsersUseCase:
 
     def execute(self) -> Sequence[User]:
         return self._repository.list()
-
