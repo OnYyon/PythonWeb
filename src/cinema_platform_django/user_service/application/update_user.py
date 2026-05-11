@@ -1,3 +1,4 @@
+from types import EllipsisType
 from uuid import UUID
 
 from src.cinema_platform_django.user_service.application.dto import (
@@ -36,7 +37,7 @@ class UpdateUserUseCase:
             phone=command.phone if isinstance(command.phone, str) else None,
             exclude_user_id=user_id,
         )
-        password_hash = UNSET
+        password_hash: str | EllipsisType = UNSET
         if isinstance(command.password, str) and command.password:
             password_hash = self._password_hasher.hash(command.password)
 
