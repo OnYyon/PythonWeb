@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from collections.abc import Sequence
+from types import EllipsisType
 from typing import Protocol
 from uuid import UUID
 
@@ -39,11 +40,11 @@ class UserRepositoryABC(ABC):
         self,
         *,
         user_id: UUID,
-        username: str | object = UNSET,
-        email: str | object = UNSET,
-        password_hash: str | object = UNSET,
-        full_name: str | object = UNSET,
-        phone: str | None | object = UNSET,
+        username: str | EllipsisType = UNSET,
+        email: str | EllipsisType = UNSET,
+        password_hash: str | EllipsisType = UNSET,
+        full_name: str | EllipsisType = UNSET,
+        phone: str | None | EllipsisType = UNSET,
     ) -> User | None: ...
 
     @abstractmethod

@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from types import EllipsisType
 
 from src.cinema_platform_django.user_service.domain.sentinels import UNSET
 
@@ -14,8 +15,8 @@ class CreateUserCommand:
 
 @dataclass(frozen=True, slots=True)
 class UpdateUserCommand:
-    username: str | object = UNSET
-    email: str | object = UNSET
-    password: str | object = UNSET
-    full_name: str | object = UNSET
-    phone: str | None | object = UNSET
+    username: str | EllipsisType = UNSET
+    email: str | EllipsisType = UNSET
+    password: str | EllipsisType = UNSET
+    full_name: str | EllipsisType = UNSET
+    phone: str | None | EllipsisType = UNSET

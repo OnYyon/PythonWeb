@@ -1,2 +1,1 @@
-UNSET = object()
-
+UNSET = ...

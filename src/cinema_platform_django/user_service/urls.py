@@ -7,6 +7,7 @@ from src.cinema_platform_django.user_service.api.views import (
 
 urlpatterns = [
     path("user/", user_collection_view, name="user-collection"),
+    path("user/<uuid:user_id>/", user_detail_media_view, name="user-detail"),
     path(
         "media/user/<uuid:user_id>/", user_detail_media_view, name="user-detail-media"
     ),
