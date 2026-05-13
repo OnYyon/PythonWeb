@@ -4,6 +4,9 @@ from typing import Literal
 
 @dataclass
 class LoggerConfig:
+    """Logger config"""
+
+    service_name: str = "testing"
     environment: Literal["prod", "dev", "testing"] = "dev"
     json_output: bool = False
     log_file: str | None = None

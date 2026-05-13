@@ -5,23 +5,26 @@ from pathlib import Path
 import structlog
 from structlog.processors import (
     JSONRenderer,
+    StackInfoRenderer,
     TimeStamper,
     add_log_level,
     format_exc_info,
 )
-from structlog.stdlib import filter_by_level
 
 from src.shared.utils.logger.config import LoggerConfig
-from src.shared.utils.logger.processors.enivoronment import add_environment
+from src.shared.utils.logger.processors.environment import add_environment
+from src.shared.utils.logger.processors.service import add_service
 
 
 def configure_logger(config: LoggerConfig):
+    """Configure structlog and logging"""
     processors = [
         structlog.contextvars.merge_contextvars,
-        filter_by_level,
         add_log_level,
+        add_service(config.service_name),
         add_environment(config.environment),
         TimeStamper(fmt=config.time_format),
+        StackInfoRenderer(),
         format_exc_info,
     ]
 
@@ -53,6 +56,7 @@ def configure_logger(config: LoggerConfig):
         level=getattr(logging, config.log_level),
         handlers=handlers,
         format="%(message)s",
+        force=True,
     )
 
     structlog.configure(
