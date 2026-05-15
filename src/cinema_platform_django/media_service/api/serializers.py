@@ -28,7 +28,11 @@ class FilmCreateUpdateSerializer(serializers.Serializer):
     release_date = serializers.DateField()
     duration = serializers.IntegerField(min_value=1)
     poster_url = serializers.URLField(allow_blank=True, required=False, allow_null=True)
-    genre_uuids = serializers.ListField(child=serializers.UUIDField(), required=False)
+    genre_uuids = serializers.ListField(
+        child=serializers.UUIDField(),
+        required=True,
+        allow_empty=False
+    )
 
 
 class WatchlistFilmSerializer(serializers.Serializer):

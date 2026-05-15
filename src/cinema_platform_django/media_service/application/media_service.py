@@ -1,5 +1,5 @@
 import uuid
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 from ..domain.interfaces import IMediaRepository
 
 
@@ -14,6 +14,8 @@ class MediaServiceApp:
         return self.repository.get_film_by_uuid(film_uuid)
 
     def create_film(self, data: Dict[str, Any]) -> Dict[str, Any]:
+        if not data.get('genre_uuids'):
+            raise ValueError("Фильм не может быть создан без указания жанра.")
         return self.repository.create_film(data)
 
     def update_film(self, film_uuid: uuid.UUID, data: Dict[str, Any]) -> Dict[str, Any]:
