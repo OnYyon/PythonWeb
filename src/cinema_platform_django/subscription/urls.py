@@ -5,15 +5,15 @@ from src.cinema_platform_django.subscription.api.v1.plans.views import (
     AdminPlanViewSet,
     PublicPlanViewSet,
 )
-from src.cinema_platform_django.subscription.api.v1.subscrption.views import (
+from src.cinema_platform_django.subscription.api.v1.subscription.views import (
     AdminSubscriptionViewSet,
-    SubscrptionViews,
+    SubscriptionViews,
 )
 
 public_router = DefaultRouter()
 public_router.register(r"plans", PublicPlanViewSet, basename="public-plans")
 public_router.register(
-    r"subscriptions", SubscrptionViews, basename="public-subscriptions"
+    r"subscriptions", SubscriptionViews, basename="public-subscriptions"
 )
 
 admin_router = DefaultRouter()
