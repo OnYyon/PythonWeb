@@ -12,7 +12,10 @@ from src.cinema_platform_django.subscription.domain.repositories.interfaces impo
     PlanRepositoryABC,
     SubRepositoryABC,
 )
-from src.cinema_platform_django.subscription.models import PlanModel, SubscriptionModel
+from src.cinema_platform_django.subscription.infrastructure.models import (
+    PlanModel,
+    SubscriptionModel,
+)
 
 
 class DjangoSubRepository(SubRepositoryABC):
