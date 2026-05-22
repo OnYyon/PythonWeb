@@ -1,9 +1,11 @@
 import uuid
 from django.db import models
 
+from src.cinema_platform_django.user_service.domain.entities import UserRole
 
-class UserRole(models.TextChoices):
-    USER = "user", "User"
+
+class DjangoUserRole(models.TextChoices):
+    USER = UserRole.USER.value, "User"
 
 
 class User(models.Model):
@@ -13,12 +15,12 @@ class User(models.Model):
     password_hash = models.CharField(max_length=255)
     role = models.CharField(
         max_length=20,
-        choices=UserRole.choices,
-        default=UserRole.USER,
+        choices=DjangoUserRole.choices,
+        default=UserRole.USER.value,
     )
     full_name = models.CharField(max_length=255, blank=True)
     phone = models.CharField(max_length=20, unique=True, null=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
