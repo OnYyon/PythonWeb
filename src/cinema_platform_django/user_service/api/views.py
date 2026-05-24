@@ -92,6 +92,7 @@ def user_collection_view(request):
     list_serializer = UserListSerializer(page, many=True)
     return paginator.get_paginated_response(list_serializer.data)
 
+
 @api_view(["GET", "POST", "DELETE"])
 def user_detail_media_view(request, user_id):
     if request.method == "GET":
