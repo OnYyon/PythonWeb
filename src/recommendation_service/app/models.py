@@ -25,7 +25,7 @@ class Film(db.Model):  # type: ignore[unsupported-base]
     genres = db.relationship("Genre", secondary="film_genres", backref="films")
 
 
-class FilmGenre(db.Model): # type: ignore[unsupported-base]
+class FilmGenre(db.Model):  # type: ignore[unsupported-base]
     __tablename__ = "film_genres"
 
     id = db.Column(db.BigInteger, primary_key=True)
