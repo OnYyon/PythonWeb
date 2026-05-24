@@ -1,13 +1,17 @@
 FROM python:3.14-slim
 
-WORKDIR /app
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
 
+WORKDIR /app
 
 RUN pip install --no-cache-dir uv
 
-
 COPY pyproject.toml uv.lock ./
-RUN uv pip install --system .
 
+RUN uv sync --frozen --no-dev
 
-COPY . .
+COPY src ./src
+COPY README.md ./
+
+ENV PYTHONPATH=/app
