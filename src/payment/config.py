@@ -25,4 +25,4 @@ class Settings(BaseSettings):
 
     @classmethod
     def from_env(cls) -> "Settings":
-        return cls()
+        return cls()  # type: ignore
