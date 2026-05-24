@@ -95,3 +95,42 @@ recommendation_service/
 curl -X GET http://127.0.0.1:5001/api/v1/recommendations/ \
   -H "X-User-Id: user-123"
 ```
+
+## Проверки кода
+
+### Lint проверки (Ruff)
+
+Проверить код на соответствие стандартам:
+
+```bash
+cd /Users/pavel/Documents/GitHub/PythonWeb
+. .venv/bin/activate
+ruff check src/recommendation_service/
+```
+
+Автоматически исправить проблемы:
+
+```bash
+ruff check src/recommendation_service/ --fix
+```
+
+### Type checking (MyPy)
+
+```bash
+mypy src/recommendation_service/ --ignore-missing-imports
+```
+
+### Syntax проверка
+
+```bash
+python3 -m py_compile src/recommendation_service/**/*.py
+```
+
+### Все проверки вместе
+
+```bash
+. .venv/bin/activate
+ruff check src/recommendation_service/
+python3 -m py_compile src/recommendation_service/**/*.py
+python3 -c "import sys; sys.path.insert(0, 'src'); from recommendation_service import create_app; print('✅ All checks passed!')"
+```

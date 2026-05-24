@@ -1,11 +1,10 @@
-import os
 import sys
 from pathlib import Path
 
 root_dir = Path(__file__).parent.parent
 sys.path.insert(0, str(root_dir))
 
-from recommendation_service import create_app
+from recommendation_service import create_app  # noqa: E402
 
 app = create_app()
 

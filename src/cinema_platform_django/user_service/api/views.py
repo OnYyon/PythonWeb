@@ -84,12 +84,13 @@ def user_collection_view(request):
     users = list_users_use_case().execute()
     paginator = UserPagination()
     page = paginator.paginate_queryset(cast(Any, users), request)
-    if page is None:
-        serializer = UserListSerializer(users, many=True)
-        return Response(serializer.data)
-    serializer = UserListSerializer(page, many=True)
-    return paginator.get_paginated_response(serializer.data)
 
+    if page is None:
+        list_serializer = UserListSerializer(users, many=True)
+        return Response(list_serializer.data)
+
+    list_serializer = UserListSerializer(page, many=True)
+    return paginator.get_paginated_response(list_serializer.data)
 
 @api_view(["GET", "POST", "DELETE"])
 def user_detail_media_view(request, user_id):
