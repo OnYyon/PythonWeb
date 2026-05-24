@@ -23,4 +23,3 @@ def recommendations():
         return jsonify(result), 200
     except Exception:
         return jsonify({"error": "Internal server error"}), 500
-    
