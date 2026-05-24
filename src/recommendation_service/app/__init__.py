@@ -8,7 +8,7 @@ def create_app():
 
     app.config["SQLALCHEMY_DATABASE_URI"] = (
         "postgresql+psycopg://cinema:P%40ssw0rd@db:5432/cinema"
-    )
+
     app.config["SQLALCHEMY_ECHO"] = False
 
     db.init_app(app)
