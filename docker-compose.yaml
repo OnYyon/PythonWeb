@@ -5,7 +5,7 @@ services:
     environment:
       POSTGRES_DB: cinema
       POSTGRES_USER: cinema
-      POSTGRES_PASSWORD: P@ssw0rd # not for prod
+      POSTGRES_PASSWORD: P@ssw0rd
     ports:
       - "5432:5432"
     volumes:
