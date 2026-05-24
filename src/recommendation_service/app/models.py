@@ -2,7 +2,7 @@ from .database import db
 import uuid
 
 
-class Genre(db.Model):
+class Genre(db.Model):  # type: ignore[unsupported-base]
     __tablename__ = "genres"
 
     uuid = db.Column(db.Uuid, primary_key=True, default=uuid.uuid4)
@@ -10,7 +10,7 @@ class Genre(db.Model):
     description = db.Column(db.Text, nullable=True)
 
 
-class Film(db.Model):
+class Film(db.Model):  # type: ignore[unsupported-base]
     __tablename__ = "films"
 
     uuid = db.Column(db.Uuid, primary_key=True, default=uuid.uuid4)
@@ -25,7 +25,7 @@ class Film(db.Model):
     genres = db.relationship("Genre", secondary="film_genres", backref="films")
 
 
-class FilmGenre(db.Model):
+class FilmGenre(db.Model): # type: ignore[unsupported-base]
     __tablename__ = "film_genres"
 
     id = db.Column(db.BigInteger, primary_key=True)
@@ -33,7 +33,7 @@ class FilmGenre(db.Model):
     genre_id = db.Column(db.Uuid, db.ForeignKey("genres.uuid"), nullable=False)
 
 
-class Watchlist(db.Model):
+class Watchlist(db.Model):  # type: ignore[unsupported-base]
     __tablename__ = "watchlist"
 
     uuid = db.Column(db.Uuid, primary_key=True, default=uuid.uuid4)
