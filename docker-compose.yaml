@@ -24,7 +24,6 @@ services:
       - .env
     environment:
       - DJANGO_SETTINGS_MODULE=src.cinema_platform_django.config.settings
-      # Указываем сразу два пути через двоеточие:
       - PYTHONPATH=/app:/app/src/cinema_platform_django
     command: ["gunicorn", "src.cinema_platform_django.config.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "4", "--worker-class", "gthread", "--threads", "4", "--log-file", "-"]
     depends_on:
@@ -59,6 +58,20 @@ services:
       db:
         condition: service_healthy
 
+  auth_service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: auth_app
+    expose:
+      - "5003"
+    env_file:
+      - .env
+    command: ["uvicorn", "src.auth_service.main:app", "--host", "0.0.0.0", "--port", "5003", "--workers", "4", "--proxy-headers", "--forwarded-allow-ips", "*"]
+    depends_on:
+      db:
+        condition: service_healthy
+
   nginx:
     image: nginx:latest
     container_name: nginx_proxy
@@ -70,6 +83,7 @@ services:
       - django_service
       - recommendation_service
       - payment_service
+      - auth_service
 
 volumes:
   postgres_data:

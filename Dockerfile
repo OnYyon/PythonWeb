@@ -20,4 +20,4 @@ RUN uv sync --no-dev
 
 RUN uv pip install gunicorn uvicorn
 
-EXPOSE 8000 5001 5002
+EXPOSE 8000 5001 5002 5003
