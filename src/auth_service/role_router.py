@@ -3,7 +3,8 @@ from __future__ import annotations
 import logging
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Header, HTTPException, Query, Response, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
 from src.auth_service.dependencies import get_auth_service, get_role_service
 from src.auth_service.schemas import CreateRoleRequest, RoleResponse, RoleUsersResponse
@@ -11,6 +12,7 @@ from src.auth_service.services import AuthService, RoleService
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/v1/role", tags=["role"])
+bearer_scheme = HTTPBearer(auto_error=False)
 
 
 def _extract_bearer_token(authorization: str | None) -> str:
@@ -24,9 +26,9 @@ def _extract_bearer_token(authorization: str | None) -> str:
 
 def _require_admin(
     service: Annotated[AuthService, Depends(get_auth_service)],
-    authorization: Annotated[str | None, Header()] = None,
+    creds: Annotated[HTTPAuthorizationCredentials | None, Depends(bearer_scheme)] = None,
 ) -> None:
-    token = _extract_bearer_token(authorization)
+    token = creds.credentials if creds else ""
     payload = service.parse_access_token(token=token)
     if payload.get("role") != "admin":
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="admin access required")

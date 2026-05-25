@@ -4,6 +4,7 @@ import logging
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, Header, Response, status
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
 from src.auth_service.dependencies import get_auth_service
 from src.auth_service.schemas import LoginRequest, LogoutRequest, RefreshRequest, TokenPairResponse
@@ -11,6 +12,7 @@ from src.auth_service.services import AuthService
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/v1/auth", tags=["auth"])
+bearer_scheme = HTTPBearer(auto_error=False)
 
 
 def _extract_bearer_token(authorization: str | None) -> str:
@@ -19,7 +21,7 @@ def _extract_bearer_token(authorization: str | None) -> str:
     parts = authorization.split(" ", maxsplit=1)
     if len(parts) == 2 and parts[0].lower() == "bearer":
         return parts[1].strip()
-    return ""
+    return authorization.strip()
 
 
 @router.post("/login", response_model=TokenPairResponse)
@@ -44,9 +46,9 @@ def refresh(
 @router.get("/validate", status_code=status.HTTP_204_NO_CONTENT)
 def validate(
     service: Annotated[AuthService, Depends(get_auth_service)],
-    authorization: Annotated[str | None, Header()] = None,
+    creds: Annotated[HTTPAuthorizationCredentials | None, Depends(bearer_scheme)] = None,
 ) -> Response:
-    token = _extract_bearer_token(authorization)
+    token = creds.credentials if creds else ""
     service.validate(token=token)
     logger.info("auth.validate succeeded")
     return Response(status_code=status.HTTP_204_NO_CONTENT)
@@ -60,4 +62,3 @@ def logout(
     service.logout(payload.token)
     logger.info("auth.logout token revoked")
     return Response(status_code=status.HTTP_204_NO_CONTENT)
-
