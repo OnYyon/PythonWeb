@@ -2,21 +2,16 @@ services:
   db:
     image: postgres:16-alpine
     container_name: cinema_db
-    environment:
-      POSTGRES_DB: cinema
-      POSTGRES_USER: cinema
-      POSTGRES_PASSWORD: P@ssw0rd
-    ports:
-      - "5432:5432"
+    env_file:
+      - .env
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./src/payment/infrastructure/sql/schema.sql:/docker-entrypoint-initdb.d/payment-001.sql
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U cinema"]
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
       interval: 10s
       timeout: 5s
       retries: 5
-
 
   django_service:
     build:
@@ -25,8 +20,12 @@ services:
     container_name: django_app
     expose:
       - "8000"
-
-    command: ["python", "src/cinema_platform_django/manage.py", "runserver", "0.0.0.0:8000"]
+    env_file:
+      - .env
+    environment:
+      - DJANGO_SETTINGS_MODULE=src.cinema_platform_django.config.settings
+      - PYTHONPATH=/app
+    command: ["gunicorn", "src.cinema_platform_django.config.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "4", "--worker-class", "gthread", "--threads", "4", "--log-file", "-"]
     depends_on:
       db:
         condition: service_healthy
@@ -38,7 +37,23 @@ services:
     container_name: flask_app
     expose:
       - "5001"
-    command: ["python", "src/recommendation_service/run.py", "5001"]
+    env_file:
+      - .env
+    command: ["gunicorn", "src.recommendation_service.app:create_app()", "--bind", "0.0.0.0:5001", "--workers", "4", "--worker-class", "gthread", "--threads", "4", "--log-file", "-"]
+    depends_on:
+      db:
+        condition: service_healthy
+
+  payment_service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: payment_app
+    expose:
+      - "5002"
+    env_file:
+      - .env
+    command: ["uvicorn", "src.payment.main:app", "--host", "0.0.0.0", "--port", "5002", "--workers", "4", "--proxy-headers", "--forwarded-allow-ips", "*"]
     depends_on:
       db:
         condition: service_healthy
@@ -53,5 +68,7 @@ services:
     depends_on:
       - django_service
       - recommendation_service
+      - payment_service
+
 volumes:
   postgres_data:
