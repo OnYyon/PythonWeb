@@ -10,11 +10,13 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./src/payment/infrastructure/sql/schema.sql:/docker-entrypoint-initdb.d/payment-001.sql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U cinema"]
       interval: 10s
       timeout: 5s
       retries: 5
+
 
   django_service:
     build:
@@ -51,6 +53,5 @@ services:
     depends_on:
       - django_service
       - recommendation_service
-
 volumes:
   postgres_data:
