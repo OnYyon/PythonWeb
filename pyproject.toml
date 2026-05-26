@@ -18,10 +18,13 @@ dependencies = [
     "pydantic>=2.12.3",
     "psycopg[binary]>=3.3.3",
     "structlog>=25.5.0",
+<<<<<<< HEAD
     "uvicorn>=0.30.0",
     "pydantic>=2.13.4",
     "flask>=3.0.0",
     "flask-sqlalchemy>=3.1.0"
+=======
+>>>>>>> 6047377 (fix: uv.lock packages after resolving conflicts)
 ]
 
 [dependency-groups]
