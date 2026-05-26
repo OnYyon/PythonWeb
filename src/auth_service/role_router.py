@@ -4,7 +4,7 @@ import logging
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
 from src.auth_service.dependencies import get_auth_service, get_role_service
 from src.auth_service.schemas import CreateRoleRequest, RoleResponse, RoleUsersResponse
@@ -26,12 +26,16 @@ def _extract_bearer_token(authorization: str | None) -> str:
 
 def _require_admin(
     service: Annotated[AuthService, Depends(get_auth_service)],
-    creds: Annotated[HTTPAuthorizationCredentials | None, Depends(bearer_scheme)] = None,
+    creds: Annotated[
+        HTTPAuthorizationCredentials | None, Depends(bearer_scheme)
+    ] = None,
 ) -> None:
     token = creds.credentials if creds else ""
     payload = service.parse_access_token(token=token)
     if payload.get("role") != "admin":
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="admin access required")
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="admin access required"
+        )
 
 
 @router.post("/", response_model=RoleResponse, status_code=status.HTTP_201_CREATED)

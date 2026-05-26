@@ -3,11 +3,16 @@ from __future__ import annotations
 import logging
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Header, Response, status
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi import APIRouter, Depends, Response, status
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
 from src.auth_service.dependencies import get_auth_service
-from src.auth_service.schemas import LoginRequest, LogoutRequest, RefreshRequest, TokenPairResponse
+from src.auth_service.schemas import (
+    LoginRequest,
+    LogoutRequest,
+    RefreshRequest,
+    TokenPairResponse,
+)
 from src.auth_service.services import AuthService
 
 logger = logging.getLogger(__name__)
@@ -25,7 +30,9 @@ def _extract_bearer_token(authorization: str | None) -> str:
 
 
 @router.post("/login", response_model=TokenPairResponse)
-def login(payload: LoginRequest, service: Annotated[AuthService, Depends(get_auth_service)]) -> TokenPairResponse:
+def login(
+    payload: LoginRequest, service: Annotated[AuthService, Depends(get_auth_service)]
+) -> TokenPairResponse:
     logger.info("auth.login requested username=%s", payload.username)
     tokens = service.login(username=payload.username, password=payload.password)
     logger.info("auth.login succeeded username=%s", payload.username)
@@ -46,7 +53,9 @@ def refresh(
 @router.get("/validate", status_code=status.HTTP_204_NO_CONTENT)
 def validate(
     service: Annotated[AuthService, Depends(get_auth_service)],
-    creds: Annotated[HTTPAuthorizationCredentials | None, Depends(bearer_scheme)] = None,
+    creds: Annotated[
+        HTTPAuthorizationCredentials | None, Depends(bearer_scheme)
+    ] = None,
 ) -> Response:
     token = creds.credentials if creds else ""
     service.validate(token=token)

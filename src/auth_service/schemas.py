@@ -44,4 +44,3 @@ class RoleUsersResponse(BaseModel):
     limit: int
     total: int
     items: list[RoleUserItem]
-

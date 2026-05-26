@@ -1,5 +1,6 @@
-from .database import db
 import uuid
+
+from .database import db
 
 
 class Genre(db.Model):  # type: ignore[unsupported-base]
