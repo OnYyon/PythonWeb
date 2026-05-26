@@ -6,7 +6,12 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Header, Response, status
 
 from src.auth_service.dependencies import get_auth_service
-from src.auth_service.schemas import LoginRequest, LogoutRequest, RefreshRequest, TokenPairResponse
+from src.auth_service.schemas import (
+    LoginRequest,
+    LogoutRequest,
+    RefreshRequest,
+    TokenPairResponse,
+)
 from src.auth_service.services import AuthService
 
 logger = logging.getLogger(__name__)
@@ -23,7 +28,9 @@ def _extract_bearer_token(authorization: str | None) -> str:
 
 
 @router.post("/login", response_model=TokenPairResponse)
-def login(payload: LoginRequest, service: Annotated[AuthService, Depends(get_auth_service)]) -> TokenPairResponse:
+def login(
+    payload: LoginRequest, service: Annotated[AuthService, Depends(get_auth_service)]
+) -> TokenPairResponse:
     logger.info("auth.login requested username=%s", payload.username)
     tokens = service.login(username=payload.username, password=payload.password)
     logger.info("auth.login succeeded username=%s", payload.username)
@@ -60,4 +67,3 @@ def logout(
     service.logout(payload.token)
     logger.info("auth.logout token revoked")
     return Response(status_code=status.HTTP_204_NO_CONTENT)
-

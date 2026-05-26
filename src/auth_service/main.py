@@ -15,7 +15,9 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-app = FastAPI(title="Auth Service", version="1.0.0", description="Token issue/validation service")
+app = FastAPI(
+    title="Auth Service", version="1.0.0", description="Token issue/validation service"
+)
 
 
 @app.middleware("http")
@@ -40,4 +42,3 @@ app.include_router(role_router)
 @app.get("/health", tags=["service"])
 def health() -> dict[str, str]:
     return {"status": "ok"}
-
