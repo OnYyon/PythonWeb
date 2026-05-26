@@ -1,6 +1,7 @@
 import uuid
 
 from flask import Blueprint, jsonify, request
+
 from .service import get_recommendations
 
 recommendations_bp = Blueprint("recommendations", __name__)
