@@ -29,7 +29,9 @@ def _require_admin(
     token = _extract_bearer_token(authorization)
     payload = service.parse_access_token(token=token)
     if payload.get("role") != "admin":
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="admin access required")
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="admin access required"
+        )
 
 
 @router.post("/", response_model=RoleResponse, status_code=status.HTTP_201_CREATED)

@@ -1,14 +1,16 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
 import os
+from dataclasses import dataclass
 
 import django
 from django.contrib.auth.hashers import check_password
 from django.db import connection
 from django.db.utils import IntegrityError
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "src.cinema_platform_django.config.settings")
+os.environ.setdefault(
+    "DJANGO_SETTINGS_MODULE", "src.cinema_platform_django.config.settings"
+)
 django.setup()
 
 
@@ -32,7 +34,9 @@ class AuthRepository:
         self._bootstrap_default_roles()
 
     def get_user_by_credentials(self, username: str, password: str) -> User | None:
-        from src.cinema_platform_django.user_service.infrastructure.models.user import User as DjangoUser
+        from src.cinema_platform_django.user_service.infrastructure.models.user import (
+            User as DjangoUser,
+        )
 
         user = DjangoUser.objects.filter(username=username).first()
         if user is None or not check_password(password, user.password_hash):
@@ -46,7 +50,9 @@ class AuthRepository:
 
     def is_token_revoked(self, jti: str) -> bool:
         with connection.cursor() as cursor:
-            cursor.execute("SELECT 1 FROM auth_revoked_tokens WHERE jti = %s LIMIT 1", [jti])
+            cursor.execute(
+                "SELECT 1 FROM auth_revoked_tokens WHERE jti = %s LIMIT 1", [jti]
+            )
             return cursor.fetchone() is not None
 
     def revoke_token(self, jti: str) -> None:
@@ -77,7 +83,9 @@ class AuthRepository:
         return Role(id=row[0], name=row[1])
 
     def delete_role(self, role_id: int) -> bool:
-        from src.cinema_platform_django.user_service.infrastructure.models.user import User as DjangoUser
+        from src.cinema_platform_django.user_service.infrastructure.models.user import (
+            User as DjangoUser,
+        )
 
         role = self.get_role(role_id=role_id)
         if role is None:
@@ -90,8 +98,12 @@ class AuthRepository:
             cursor.execute("DELETE FROM auth_roles WHERE id = %s", [role_id])
             return cursor.rowcount > 0
 
-    def get_users_by_role(self, role_id: int, page: int, limit: int) -> tuple[list[User], int]:
-        from src.cinema_platform_django.user_service.infrastructure.models.user import User as DjangoUser
+    def get_users_by_role(
+        self, role_id: int, page: int, limit: int
+    ) -> tuple[list[User], int]:
+        from src.cinema_platform_django.user_service.infrastructure.models.user import (
+            User as DjangoUser,
+        )
 
         role = self.get_role(role_id=role_id)
         if role is None:

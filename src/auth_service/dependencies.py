@@ -23,4 +23,3 @@ def get_auth_service() -> AuthService:
 
 def get_role_service() -> RoleService:
     return RoleService(repository=get_repository())
-

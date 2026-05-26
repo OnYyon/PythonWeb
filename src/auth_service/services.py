@@ -9,14 +9,20 @@ from src.shared.auth_token import JwtTokenManager, TokenError
 
 
 class AuthService:
-    def __init__(self, repository: AuthRepository, token_manager: JwtTokenManager) -> None:
+    def __init__(
+        self, repository: AuthRepository, token_manager: JwtTokenManager
+    ) -> None:
         self.repository = repository
         self.token_manager = token_manager
 
     def login(self, username: str, password: str) -> dict[str, str]:
-        user = self.repository.get_user_by_credentials(username=username, password=password)
+        user = self.repository.get_user_by_credentials(
+            username=username, password=password
+        )
         if not user:
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="invalid credentials")
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED, detail="invalid credentials"
+            )
 
         claims = {
             "sub": str(user.id),
@@ -62,17 +68,25 @@ class AuthService:
         try:
             payload = self.token_manager.parse_and_validate(token)
         except TokenError as exc:
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="invalid token") from exc
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED, detail="invalid token"
+            ) from exc
 
         token_type = payload.get("token_type")
         if expected_type and token_type != expected_type:
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="wrong token type")
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED, detail="wrong token type"
+            )
 
         jti = payload.get("jti")
         if not isinstance(jti, str):
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="invalid token payload")
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED, detail="invalid token payload"
+            )
         if self.repository.is_token_revoked(jti):
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="token revoked")
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED, detail="token revoked"
+            )
         return payload
 
 
@@ -84,13 +98,19 @@ class RoleService:
         try:
             return self.repository.create_role(name=name)
         except ValueError as exc:
-            raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(exc)) from exc
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT, detail=str(exc)
+            ) from exc
 
     def get_users_by_role(self, role_id: int, page: int, limit: int) -> dict[str, Any]:
         role = self.repository.get_role(role_id=role_id)
         if role is None:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="role not found")
-        items, total = self.repository.get_users_by_role(role_id=role_id, page=page, limit=limit)
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="role not found"
+            )
+        items, total = self.repository.get_users_by_role(
+            role_id=role_id, page=page, limit=limit
+        )
         return {
             "role_id": role.id,
             "role_name": role.name,
@@ -110,7 +130,9 @@ class RoleService:
     def delete_role(self, role_id: int) -> None:
         role = self.repository.get_role(role_id=role_id)
         if role is None:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="role not found")
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="role not found"
+            )
         deleted = self.repository.delete_role(role_id=role_id)
         if not deleted:
             raise HTTPException(

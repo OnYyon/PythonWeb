@@ -1,6 +1,7 @@
 from sqlalchemy import desc
+
 from .database import db
-from .models import Watchlist, Film, Genre
+from .models import Film, Genre, Watchlist
 
 
 def get_recommendations(user_id: str) -> list:
