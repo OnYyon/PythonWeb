@@ -108,14 +108,9 @@ dependencies = [
     { name = "httpx" },
     { name = "psycopg", extra = ["binary"] },
     { name = "pydantic" },
-<<<<<<< HEAD
     { name = "pydantic-settings" },
     { name = "structlog" },
     { name = "uvicorn" },
-=======
-    { name = "pyjwt" },
-    { name = "structlog" },
->>>>>>> 6047377 (fix: uv.lock packages after resolving conflicts)
 ]
 
 [package.dev-dependencies]
@@ -139,16 +134,10 @@ requires-dist = [
     { name = "flask-sqlalchemy", specifier = ">=3.1.0" },
     { name = "httpx", specifier = ">=0.28.1" },
     { name = "psycopg", extras = ["binary"], specifier = ">=3.3.3" },
-<<<<<<< HEAD
     { name = "pydantic", specifier = ">=2.13.4" },
     { name = "pydantic-settings", specifier = ">=2.4.0" },
     { name = "structlog", specifier = ">=25.5.0" },
     { name = "uvicorn", specifier = ">=0.30.0" },
-=======
-    { name = "pydantic", specifier = ">=2.12.3" },
-    { name = "pyjwt", specifier = ">=2.10.1" },
-    { name = "structlog", specifier = ">=25.5.0" },
->>>>>>> 6047377 (fix: uv.lock packages after resolving conflicts)
 ]
 
 [package.metadata.requires-dev]
