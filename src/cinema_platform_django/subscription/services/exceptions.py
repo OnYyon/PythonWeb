@@ -35,3 +35,41 @@ class SubscriptionRenewalNotAllowedError(SubscriptionServiceError):
             f"Cannot renew this subscription (auto_renew is off): {sub_id}"
         )
         self.sub_id = sub_id
+
+
+class PaymentServiceError(SubscriptionServiceError):
+    """Base error for payment flow in subscription service."""
+
+
+class PaymentCardNotFoundError(PaymentServiceError):
+    def __init__(self, card_id: UUID) -> None:
+        super().__init__(f"Card not found: {card_id}")
+        self.card_id = card_id
+
+
+class PaymentCardForbiddenError(PaymentServiceError):
+    def __init__(self, card_id: UUID) -> None:
+        super().__init__(f"Card ownership forbidden: {card_id}")
+        self.card_id = card_id
+
+
+class PaymentInvalidAmountError(PaymentServiceError):
+    def __init__(self, amount: str) -> None:
+        super().__init__(f"Invalid payment amount: {amount}")
+        self.amount = amount
+
+
+class PaymentFailedError(PaymentServiceError):
+    def __init__(self, sub_id: UUID) -> None:
+        super().__init__(f"Payment failed for subscription: {sub_id}")
+        self.sub_id = sub_id
+
+
+class PaymentServiceUnavailableError(PaymentServiceError):
+    def __init__(self, message: str = "payment service unavailable") -> None:
+        super().__init__(message)
+
+
+class PaymentResponseError(PaymentServiceError):
+    def __init__(self, message: str = "invalid payment response") -> None:
+        super().__init__(message)

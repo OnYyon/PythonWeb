@@ -10,12 +10,19 @@ from src.cinema_platform_django.subscription.api.v1.exceptions import (
 )
 from src.cinema_platform_django.subscription.api.v1.subscription.serializers import (
     SubscriptionCreateSerializer,
+    SubscriptionPaymentSerializer,
     SubscriptionSerializer,
 )
 from src.cinema_platform_django.subscription.dependencies import (
     get_subscription_service,
 )
 from src.cinema_platform_django.subscription.services.exceptions import (
+    PaymentCardForbiddenError,
+    PaymentCardNotFoundError,
+    PaymentFailedError,
+    PaymentInvalidAmountError,
+    PaymentResponseError,
+    PaymentServiceUnavailableError,
     PlanNotFoundError,
     SubscriptionAlreadyActiveError,
     SubscriptionNotFoundError,
@@ -41,6 +48,20 @@ def map_subscription_service_error(
         return make_error(status.HTTP_404_NOT_FOUND, "plan not found")
     if isinstance(error, SubscriptionNotFoundError):
         return make_error(status.HTTP_404_NOT_FOUND, "subscription not found")
+    if isinstance(error, PaymentCardNotFoundError):
+        return make_error(status.HTTP_404_NOT_FOUND, "card not found")
+    if isinstance(error, PaymentCardForbiddenError):
+        return make_error(status.HTTP_403_FORBIDDEN, "card ownership forbidden")
+    if isinstance(error, PaymentInvalidAmountError):
+        return make_error(status.HTTP_400_BAD_REQUEST, "invalid payment amount")
+    if isinstance(error, PaymentFailedError):
+        return make_error(status.HTTP_402_PAYMENT_REQUIRED, "payment failed")
+    if isinstance(error, PaymentResponseError):
+        return make_error(status.HTTP_502_BAD_GATEWAY, "payment response invalid")
+    if isinstance(error, PaymentServiceUnavailableError):
+        return make_error(
+            status.HTTP_503_SERVICE_UNAVAILABLE, "payment service unavailable"
+        )
 
     return make_error(status.HTTP_400_BAD_REQUEST, str(error))
 
@@ -129,7 +150,7 @@ class SubscriptionViews(viewsets.ViewSet):
 
     @action(detail=False, methods=["post"], url_path="me/activate")
     def activate_me(self, request) -> Response:
-        """POST api/v1/subscriptions/me/activate/"""
+        """POST api/v1/subscriptions/me/activate/ (body: {card_id})"""
         try:
             user_id = self._get_user_id(request)
         except NotAuth:
@@ -140,8 +161,15 @@ class SubscriptionViews(viewsets.ViewSet):
         if not sub:
             return make_error(status.HTTP_404_NOT_FOUND, "no subscription found")
 
+        serializer = SubscriptionPaymentSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
         try:
-            sub = service.activate(sub.sub_id)
+            sub = service.activate_with_payment(
+                user_id=user_id,
+                sub_id=sub.sub_id,
+                card_id=serializer.validated_data["card_id"],
+            )
         except SubscriptionServiceError as e:
             return map_subscription_service_error(e)
 
@@ -169,7 +197,7 @@ class SubscriptionViews(viewsets.ViewSet):
 
     @action(detail=False, methods=["post"], url_path="me/renew")
     def renew_me(self, request) -> Response:
-        """POST api/v1/subscriptions/me/renew/"""
+        """POST api/v1/subscriptions/me/renew/ (body: {card_id})"""
         try:
             user_id = self._get_user_id(request)
         except NotAuth:
@@ -180,8 +208,15 @@ class SubscriptionViews(viewsets.ViewSet):
         if not sub:
             return make_error(status.HTTP_404_NOT_FOUND, "no subscription found")
 
+        serializer = SubscriptionPaymentSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
         try:
-            sub = service.renew(sub.sub_id)
+            sub = service.renew_with_payment(
+                user_id=user_id,
+                sub_id=sub.sub_id,
+                card_id=serializer.validated_data["card_id"],
+            )
         except SubscriptionServiceError as e:
             return map_subscription_service_error(e)
 
