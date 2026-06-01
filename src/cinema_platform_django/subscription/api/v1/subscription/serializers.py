@@ -12,6 +12,10 @@ class SubscriptionCreateSerializer(serializers.Serializer):
     auto_renew = serializers.BooleanField(required=False, default=False)
 
 
+class SubscriptionPaymentSerializer(serializers.Serializer):
+    card_id = serializers.UUIDField()
+
+
 # TODO: use serializers.ModelSerializer
 class SubscriptionSerializer(serializers.Serializer):
     """
