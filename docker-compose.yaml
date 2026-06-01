@@ -81,21 +81,15 @@ services:
     build: .
     ports:
       - "5001:5001"
-    command:
-      [
-        "gunicorn",
-        "src.recommendation_service.app:create_app()",
-        "--bind",
-        "0.0.0.0:5001",
-        "--workers",
-        "4",
-        "--worker-class",
-        "gthread",
-        "--threads",
-        "4",
-        "--log-file",
-        "-",
-      ]
+    command: >
+      sh -c "
+          uv run gunicorn 'src.recommendation_service.app:create_app()' \
+          --bind 0.0.0.0:5001 \
+          --workers 4 \
+          --worker-class gthread \
+          --threads 4 \
+          --log-file -
+          "
     depends_on:
       db:
         condition: service_healthy
