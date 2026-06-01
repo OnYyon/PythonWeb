@@ -4,7 +4,8 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException
 
-from src.payment.api.deps import get_payment_service
+from src.payment.api.auth import AuthContext, get_auth_context
+from src.payment.api.deps import get_card_service, get_payment_service
 from src.payment.api.schemas import PaymentCreateRequest, PaymentResponse
 from src.payment.domain.exceptions import (
     CardNotFoundError,
@@ -12,6 +13,7 @@ from src.payment.domain.exceptions import (
     InvalidAmountError,
     PaymentNotFoundError,
 )
+from src.payment.services.card import CardService
 from src.payment.services.payments import PaymentService
 
 router = APIRouter(tags=["payments"])
@@ -31,11 +33,12 @@ def _payment_response(payment) -> PaymentResponse:
 @router.post("/payments", response_model=PaymentResponse)
 async def pay_subscription(
     payload: PaymentCreateRequest,
+    auth: AuthContext = Depends(get_auth_context),
     service: PaymentService = Depends(get_payment_service),
 ) -> PaymentResponse:
     try:
         payment = await service.pay_subscription(
-            user_id=payload.user_id,
+            user_id=auth.user_id,
             card_id=payload.card_id,
             sub_id=payload.sub_id,
             amount=payload.amount,
@@ -52,6 +55,7 @@ async def pay_subscription(
 @router.get("/payments/{payment_id}", response_model=PaymentResponse)
 async def get_payment(
     payment_id: UUID,
+    _: AuthContext = Depends(get_auth_context),
     service: PaymentService = Depends(get_payment_service),
 ) -> PaymentResponse:
     try:
@@ -64,7 +68,15 @@ async def get_payment(
 @router.get("/cards/{card_id}/payments", response_model=list[PaymentResponse])
 async def list_payments_for_card(
     card_id: UUID,
+    auth: AuthContext = Depends(get_auth_context),
     service: PaymentService = Depends(get_payment_service),
+    card_service: CardService = Depends(get_card_service),
 ) -> list[PaymentResponse]:
+    try:
+        card = await card_service.get_card(card_id=card_id)
+    except CardNotFoundError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    if card.user_id != auth.user_id:
+        raise HTTPException(status_code=403, detail="forbidden")
     payments = await service.list_payments_for_card(card_id=card_id)
     return [_payment_response(payment) for payment in payments]

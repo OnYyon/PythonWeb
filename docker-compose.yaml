@@ -31,6 +31,7 @@ services:
       DB_NAME: cinema
       DB_USER: cinema
       DB_PASSWORD: P@ssw0rd
+      AUTH_SECRET_KEY: ${AUTH_SECRET_KEY:-dev-secret-change-me-please-32chars}
     volumes:
       - ./src:/app/src
     depends_on:
@@ -48,6 +49,7 @@ services:
       PAYMENT_DATABASE_DSN: postgresql://cinema:P%40ssw0rd@db:5432/cinema
       PAYMENT_DB_POOL_MIN: 1
       PAYMENT_DB_POOL_MAX: 10
+      AUTH_SECRET_KEY: ${AUTH_SECRET_KEY:-dev-secret-change-me-please-32chars}
     volumes:
       - ./src:/app/src
     depends_on:
@@ -55,6 +57,27 @@ services:
         condition: service_healthy
     expose:
       - "8001"
+
+  auth:
+    build: .
+    command: >
+      uv run python -m uvicorn src.auth_service.main:app
+      --host 0.0.0.0 --port 8002
+    environment:
+      DJANGO_SETTINGS_MODULE: src.cinema_platform_django.config.settings
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: cinema
+      DB_USER: cinema
+      DB_PASSWORD: P@ssw0rd
+      AUTH_SECRET_KEY: ${AUTH_SECRET_KEY:-dev-secret-change-me-please-32chars}
+    volumes:
+      - ./src:/app/src
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8002:8002"
 
   nginx:
     image: nginx:alpine
@@ -66,6 +89,7 @@ services:
     depends_on:
       - django
       - payment
+      - auth
 
 volumes:
   postgres_data:

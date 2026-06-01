@@ -4,6 +4,10 @@ from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
+from src.cinema_platform_django.subscription.api.v1.auth import (
+    AuthContext,
+    get_auth_context,
+)
 from src.cinema_platform_django.subscription.api.v1.errors import make_error
 from src.cinema_platform_django.subscription.api.v1.exceptions import (
     NotAuth,
@@ -67,19 +71,19 @@ def map_subscription_service_error(
 
 
 class SubscriptionViews(viewsets.ViewSet):
-    def _get_user_id(self, request) -> UUID:
-        """Вспомогательный метод для получения user_id из заголовков."""
-        user_id_str = request.headers.get("X-User-Id")
-        if not user_id_str:
-            raise NotAuth()
-        return UUID(user_id_str)
+    def _get_auth_context(self, request) -> AuthContext:
+        """Вспомогательный метод для получения user_id/role из JWT."""
+        return get_auth_context(request)
 
     def create(self, request) -> Response:
         """POST api/v1/subscriptions/"""
         try:
-            user_id = self._get_user_id(request)
+            auth = self._get_auth_context(request)
         except NotAuth:
-            return make_error(status.HTTP_401_UNAUTHORIZED, "neeed X-User-Id header")
+            return make_error(
+                status.HTTP_401_UNAUTHORIZED,
+                "need Authorization: Bearer <token>",
+            )
 
         serializer = SubscriptionCreateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -87,7 +91,7 @@ class SubscriptionViews(viewsets.ViewSet):
         service = get_subscription_service()
         try:
             sub = service.create(
-                user_id=user_id,
+                user_id=auth.user_id,
                 plan_id=serializer.validated_data["plan_id"],
                 auto_renew=serializer.validated_data["auto_renew"],
             )
@@ -101,9 +105,12 @@ class SubscriptionViews(viewsets.ViewSet):
     def retrieve(self, request, pk=None) -> Response:
         """GET api/v1/subscriptions/{id}"""
         try:
-            user_id = self._get_user_id(request)
+            auth = self._get_auth_context(request)
         except NotAuth:
-            return make_error(status.HTTP_401_UNAUTHORIZED, "neeed X-User-Id header")
+            return make_error(
+                status.HTTP_401_UNAUTHORIZED,
+                "need Authorization: Bearer <token>",
+            )
 
         try:
             sub_id = UUID(pk)
@@ -116,7 +123,7 @@ class SubscriptionViews(viewsets.ViewSet):
         except SubscriptionServiceError as e:
             return map_subscription_service_error(e)
 
-        if str(sub.user_id) != str(user_id):
+        if str(sub.user_id) != str(auth.user_id):
             return make_error(status.HTTP_403_FORBIDDEN, "ohh no, how can you do this?")
 
         return Response(SubscriptionSerializer(sub).data)
@@ -125,12 +132,15 @@ class SubscriptionViews(viewsets.ViewSet):
     def me(self, request) -> Response:
         """GET api/v1/subscriptions/me/"""
         try:
-            user_id = self._get_user_id(request)
+            auth = self._get_auth_context(request)
         except NotAuth:
-            return make_error(status.HTTP_401_UNAUTHORIZED, "neeed X-User-Id header")
+            return make_error(
+                status.HTTP_401_UNAUTHORIZED,
+                "need Authorization: Bearer <token>",
+            )
 
         service = get_subscription_service()
-        sub = service.get_active_for_user(user_id)
+        sub = service.get_active_for_user(auth.user_id)
         if not sub:
             return make_error(status.HTTP_404_NOT_FOUND, "no subscription found")
 
@@ -140,24 +150,30 @@ class SubscriptionViews(viewsets.ViewSet):
     def history(self, request) -> Response:
         """GET api/v1/subscriptions/me/history"""
         try:
-            user_id = self._get_user_id(request)
+            auth = self._get_auth_context(request)
         except NotAuth:
-            return make_error(status.HTTP_401_UNAUTHORIZED, "neeed X-User-Id header")
+            return make_error(
+                status.HTTP_401_UNAUTHORIZED,
+                "need Authorization: Bearer <token>",
+            )
 
         service = get_subscription_service()
-        subs = service.get_user_history(user_id)
+        subs = service.get_user_history(auth.user_id)
         return Response(SubscriptionSerializer(subs, many=True).data)
 
     @action(detail=False, methods=["post"], url_path="me/activate")
     def activate_me(self, request) -> Response:
         """POST api/v1/subscriptions/me/activate/ (body: {card_id})"""
         try:
-            user_id = self._get_user_id(request)
+            auth = self._get_auth_context(request)
         except NotAuth:
-            return make_error(status.HTTP_401_UNAUTHORIZED, "neeed X-User-Id header")
+            return make_error(
+                status.HTTP_401_UNAUTHORIZED,
+                "need Authorization: Bearer <token>",
+            )
 
         service = get_subscription_service()
-        sub = service.get_active_for_user(user_id)
+        sub = service.get_active_for_user(auth.user_id)
         if not sub:
             return make_error(status.HTTP_404_NOT_FOUND, "no subscription found")
 
@@ -166,7 +182,7 @@ class SubscriptionViews(viewsets.ViewSet):
 
         try:
             sub = service.activate_with_payment(
-                user_id=user_id,
+                user_id=auth.user_id,
                 sub_id=sub.sub_id,
                 card_id=serializer.validated_data["card_id"],
             )
@@ -179,12 +195,15 @@ class SubscriptionViews(viewsets.ViewSet):
     def cancel_me(self, request) -> Response:
         """POST api/v1/subscriptions/me/cancel/"""
         try:
-            user_id = self._get_user_id(request)
+            auth = self._get_auth_context(request)
         except NotAuth:
-            return make_error(status.HTTP_401_UNAUTHORIZED, "neeed X-User-Id header")
+            return make_error(
+                status.HTTP_401_UNAUTHORIZED,
+                "need Authorization: Bearer <token>",
+            )
 
         service = get_subscription_service()
-        sub = service.get_active_for_user(user_id)
+        sub = service.get_active_for_user(auth.user_id)
         if not sub:
             return make_error(status.HTTP_404_NOT_FOUND, "no subscription found")
 
@@ -199,12 +218,15 @@ class SubscriptionViews(viewsets.ViewSet):
     def renew_me(self, request) -> Response:
         """POST api/v1/subscriptions/me/renew/ (body: {card_id})"""
         try:
-            user_id = self._get_user_id(request)
+            auth = self._get_auth_context(request)
         except NotAuth:
-            return make_error(status.HTTP_401_UNAUTHORIZED, "neeed X-User-Id header")
+            return make_error(
+                status.HTTP_401_UNAUTHORIZED,
+                "need Authorization: Bearer <token>",
+            )
 
         service = get_subscription_service()
-        sub = service.get_active_for_user(user_id)
+        sub = service.get_active_for_user(auth.user_id)
         if not sub:
             return make_error(status.HTTP_404_NOT_FOUND, "no subscription found")
 
@@ -213,7 +235,7 @@ class SubscriptionViews(viewsets.ViewSet):
 
         try:
             sub = service.renew_with_payment(
-                user_id=user_id,
+                user_id=auth.user_id,
                 sub_id=sub.sub_id,
                 card_id=serializer.validated_data["card_id"],
             )
@@ -226,9 +248,12 @@ class SubscriptionViews(viewsets.ViewSet):
     def status(self, request, pk=None) -> Response:
         """GET api/v1/subscriptions/{id}/status"""
         try:
-            user_id = self._get_user_id(request)
+            auth = self._get_auth_context(request)
         except NotAuth:
-            return make_error(status.HTTP_401_UNAUTHORIZED, "neeed X-User-Id header")
+            return make_error(
+                status.HTTP_401_UNAUTHORIZED,
+                "need Authorization: Bearer <token>",
+            )
 
         try:
             sub_id = UUID(pk)
@@ -241,23 +266,22 @@ class SubscriptionViews(viewsets.ViewSet):
         except SubscriptionServiceError as e:
             return map_subscription_service_error(e)
 
-        if str(sub.user_id) != str(user_id):
+        if str(sub.user_id) != str(auth.user_id):
             return make_error(status.HTTP_403_FORBIDDEN, "ohh no, how can you do this?")
 
         status_value = sub.status.value if hasattr(sub.status, "value") else sub.status
         return Response({"status": status_value})
 
 
-# TODO: add check role
 class AdminSubscriptionViewSet(viewsets.ViewSet):
     """GET /api/v1/admin/subscriptions/"""
 
-    def list(self) -> Response:
+    def list(self, request) -> Response:
         service = get_subscription_service()
         subs = service.get_all()
         return Response(SubscriptionSerializer(subs, many=True).data)
 
-    def retrieve(self, pk=None) -> Response:
+    def retrieve(self, request, pk=None) -> Response:
         service = get_subscription_service()
         try:
             sub_id = UUID(pk)
@@ -272,7 +296,7 @@ class AdminSubscriptionViewSet(viewsets.ViewSet):
         return Response(SubscriptionSerializer(sub).data)
 
     @action(detail=True, methods=["post"])
-    def activate(self, pk=None) -> Response:
+    def activate(self, request, pk=None) -> Response:
         """POST /api/v1/admin/subscriptions/{id}/activate/"""
         service = get_subscription_service()
         try:
@@ -288,7 +312,7 @@ class AdminSubscriptionViewSet(viewsets.ViewSet):
         return Response(SubscriptionSerializer(sub).data)
 
     @action(detail=True, methods=["post"])
-    def cancel(self, pk=None) -> Response:
+    def cancel(self, request, pk=None) -> Response:
         """POST /api/v1/admin/subscriptions/{id}/cancel/"""
         service = get_subscription_service()
         try:
@@ -304,7 +328,7 @@ class AdminSubscriptionViewSet(viewsets.ViewSet):
         return Response(SubscriptionSerializer(sub).data)
 
     @action(detail=True, methods=["post"])
-    def renew(self, pk=None) -> Response:
+    def renew(self, request, pk=None) -> Response:
         """POST /api/v1/admin/subscriptions/{id}/renew/"""
         service = get_subscription_service()
         try:
