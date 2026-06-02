@@ -131,4 +131,63 @@ https://www.postman.com/okyyok/workspace/python-web/request/42759148-e65d448f-72
   }'
   ```
 
+
 Итог вы создали пользоветеля, создали для него карту и оплатили подписку, план который вы тоже создали
+
+
+### Флоу для сервиса рекомендаций
+- Endpoint: GET /api/v1/recommendations
+  - Авторизация: Authorization: Bearer <JWT> (в payload должен быть user_id)
+  - Успешный ответ: 200 JSON массив фильмов; поля: id, title, description, release_date (ISO), duration, poster_url, genres: [{id, name}]
+  - Ошибки: 401 при отсутствии/некорректном токене, 400 при неверном форматe user_id, 500 при внутренней ошибке
+
+Поведение:
+- Если у пользователя нет записей в watchlist → возвращаются 10 новейших фильмов
+- Иначе → подбираются до 10 фильмов по любимым жанрам пользователя, исключая уже просмотренные
+- Если рекомендаций по жанрам нет → fallback: 10 новейших фильмов, исключая просмотренные
+
+Пример запроса:
+```bash
+curl -s 'http://localhost:5001/api/v1/recommendations' \
+  -H 'Authorization: Bearer {{access_token}}'
+```
+
+Примечание: сервис получает user_id из JWT; параметр user_id в query не используется.
+
+Примеры ответов:
+
+- 200 OK — успешный ответ (массив фильмов):
+```json
+[
+  {
+    "id": "111e4567-e89b-12d3-a456-426614174000",
+    "title": "Example Film",
+    "description": "Короткое описание",
+    "release_date": "2025-12-01",
+    "duration": 120,
+    "poster_url": "http://example.com/poster.jpg",
+    "genres": [{"id": "222e4567-e89b-12d3-a456-426614174000", "name": "Drama"}]
+  }
+]
+```
+
+- 401 Unauthorized — отсутствие или некорректный Bearer токен:
+```json
+{"error": "Unauthorized"}
+```
+или
+```json
+{"error": "Invalid or expired token"}
+```
+
+- 400 Bad Request — неверный формат user_id в payload токена:
+```json
+{"error": "Invalid User ID format"}
+```
+
+- 500 Internal Server Error — внутренняя ошибка сервиса:
+```json
+{"error": "Internal server error"}
+```
+
+(Если в БД нет фильмов/данных — успешный 200 может вернуть пустой массив `[]`.)
