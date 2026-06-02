@@ -1,4 +1,5 @@
-from typing import Any, Awaitable, Protocol
+from collections.abc import Awaitable
+from typing import Any, Protocol
 from uuid import UUID
 
 import asyncpg
