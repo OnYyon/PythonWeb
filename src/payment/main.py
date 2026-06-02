@@ -17,7 +17,7 @@ def create_app() -> FastAPI:
 
     settings = Settings.from_env()
     db = Database(
-        dsn=settings.database_dsn,
+        dsn=settings.resolved_database_dsn,
         min_size=settings.pool_min_size,
         max_size=settings.pool_max_size,
     )

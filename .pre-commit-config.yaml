@@ -3,7 +3,7 @@ repos:
     hooks:
       - id: mypy
         name: mypy
-        entry: bash scripts/pre-commit-mypy.sh
+        entry: env DB_NAME=cinema DB_USER=cinema DB_PASSWORD=P@ssw0rd DB_HOST=localhost DB_PORT=5432 mypy
         language: python
         types: [python]
         args:

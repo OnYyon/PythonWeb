@@ -1,8 +1,9 @@
-from .database import db
 import uuid
 
+from .database import db
 
-class Genre(db.Model):  # type: ignore[unsupported-base]
+
+class Genre(db.Model):  # type: ignore[unsupported-base]  # ty: ignore[unsupported-base]
     __tablename__ = "genres"
 
     uuid = db.Column(db.Uuid, primary_key=True, default=uuid.uuid4)
@@ -10,7 +11,7 @@ class Genre(db.Model):  # type: ignore[unsupported-base]
     description = db.Column(db.Text, nullable=True)
 
 
-class Film(db.Model):  # type: ignore[unsupported-base]
+class Film(db.Model):  # type: ignore[unsupported-base]  # ty: ignore[unsupported-base]
     __tablename__ = "films"
 
     uuid = db.Column(db.Uuid, primary_key=True, default=uuid.uuid4)
@@ -25,7 +26,7 @@ class Film(db.Model):  # type: ignore[unsupported-base]
     genres = db.relationship("Genre", secondary="film_genres", backref="films")
 
 
-class FilmGenre(db.Model):  # type: ignore[unsupported-base]
+class FilmGenre(db.Model):  # type: ignore[unsupported-base]  # ty: ignore[unsupported-base]
     __tablename__ = "film_genres"
 
     id = db.Column(db.BigInteger, primary_key=True)
@@ -33,7 +34,7 @@ class FilmGenre(db.Model):  # type: ignore[unsupported-base]
     genre_id = db.Column(db.Uuid, db.ForeignKey("genres.uuid"), nullable=False)
 
 
-class Watchlist(db.Model):  # type: ignore[unsupported-base]
+class Watchlist(db.Model):  # type: ignore[unsupported-base]  # ty: ignore[unsupported-base]
     __tablename__ = "watchlist"
 
     uuid = db.Column(db.Uuid, primary_key=True, default=uuid.uuid4)

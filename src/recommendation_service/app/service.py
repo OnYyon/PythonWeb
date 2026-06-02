@@ -1,7 +1,13 @@
+from typing import Any, cast
+
 from sqlalchemy import desc
+from sqlalchemy.orm import selectinload
+from sqlalchemy.orm.attributes import QueryableAttribute
 
 from .database import db
 from .models import Film, Genre, Watchlist
+
+film_genres = cast(QueryableAttribute[Any], Film.genres)
 
 
 def get_recommendations(user_id: str) -> list:
@@ -9,7 +15,12 @@ def get_recommendations(user_id: str) -> list:
     watched_film_ids = [w.film_id for w in user_watchlist]
 
     if not watched_film_ids:
-        newest_films = Film.query.order_by(desc(Film.release_date)).limit(10).all()
+        newest_films = (
+            Film.query.options(selectinload(film_genres))
+            .order_by(desc(Film.release_date))
+            .limit(10)
+            .all()
+        )
         return _serialize_films(newest_films)
 
     favorite_genres = (
@@ -22,7 +33,8 @@ def get_recommendations(user_id: str) -> list:
     genre_ids = [g[0] for g in favorite_genres]
 
     recommended_films = (
-        Film.query.join(Film.genres)
+        Film.query.options(selectinload(film_genres))
+        .join(Film.genres)
         .filter(Genre.uuid.in_(genre_ids))
         .filter(~Film.uuid.in_(watched_film_ids))
         .distinct()
@@ -32,7 +44,8 @@ def get_recommendations(user_id: str) -> list:
 
     if not recommended_films:
         fallback_films = (
-            Film.query.filter(~Film.uuid.in_(watched_film_ids))
+            Film.query.options(selectinload(film_genres))
+            .filter(~Film.uuid.in_(watched_film_ids))
             .order_by(desc(Film.release_date))
             .limit(10)
             .all()
@@ -43,7 +56,6 @@ def get_recommendations(user_id: str) -> list:
 
 
 def _serialize_films(films: list) -> list:
-    """Вспомогательная функция для превращения объектов SQLAlchemy в dict для JSON"""
     return [
         {
             "id": str(film.uuid),
