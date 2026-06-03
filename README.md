@@ -131,13 +131,12 @@ https://www.postman.com/okyyok/workspace/python-web/request/42759148-e65d448f-72
   }'
   ```
 
-
 Итог вы создали пользоветеля, создали для него карту и оплатили подписку, план который вы тоже создали
 
 
 ### Флоу для сервиса рекомендаций
 - Endpoint: GET /api/v1/recommendations
-  - Авторизация: Authorization: Bearer <JWT> (в payload должен быть user_id)
+  - Авторизация: Authorization: Bearer <JWT> (в payload должен быть sub; user_id поддерживается как fallback)
   - Успешный ответ: 200 JSON массив фильмов; поля: id, title, description, release_date (ISO), duration, poster_url, genres: [{id, name}]
   - Ошибки: 401 при отсутствии/некорректном токене, 400 при неверном форматe user_id, 500 при внутренней ошибке
 
@@ -152,7 +151,7 @@ curl -s 'http://localhost:5001/api/v1/recommendations' \
   -H 'Authorization: Bearer {{access_token}}'
 ```
 
-Примечание: сервис получает user_id из JWT; параметр user_id в query не используется.
+Примечание: сервис получает id пользователя из JWT; параметр user_id в query не используется.
 
 Примеры ответов:
 
