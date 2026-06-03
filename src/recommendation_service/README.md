@@ -126,11 +126,4 @@ mypy src/recommendation_service/ --ignore-missing-imports
 python3 -m py_compile src/recommendation_service/**/*.py
 ```
 
-### Все проверки вместе
 
-```bash
-. .venv/bin/activate
-ruff check src/recommendation_service/
-python3 -m py_compile src/recommendation_service/**/*.py
-python3 -c "import sys; sys.path.insert(0, 'src'); from recommendation_service import create_app; print('✅ All checks passed!')"
-```

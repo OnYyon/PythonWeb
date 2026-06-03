@@ -1,17 +1,19 @@
 FROM python:3.14-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1
+    PYTHONUNBUFFERED=1 \
+    PATH="/app/.venv/bin:$PATH"
 
 WORKDIR /app
 
+RUN groupadd -r appgroup && useradd -r -g appgroup -d /app -s /sbin/nologin appuser
+
+RUN chown -R appuser:appgroup /app
+
 RUN pip install --no-cache-dir uv
 
-COPY pyproject.toml uv.lock ./
+COPY --chown=appuser:appgroup . .
 
-RUN uv sync --frozen --no-dev
+USER appuser
 
-COPY src ./src
-COPY README.md ./
-
-ENV PYTHONPATH=/app
+RUN uv sync --no-dev --frozen

@@ -37,7 +37,7 @@ class PaymentGatewayUnavailableError(PaymentGatewayError):
 def _resolve_dsn() -> str:
     try:
         settings = Settings.from_env()
-        return settings.database_dsn
+        return settings.resolved_database_dsn
     except ValidationError, ValueError:
         host = os.getenv("DB_HOST", "127.0.0.1")
         port = os.getenv("DB_PORT", "5432")

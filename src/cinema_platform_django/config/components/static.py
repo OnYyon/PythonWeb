@@ -1,4 +1,7 @@
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/6.0/howto/static-files/
+from pathlib import Path
 
 STATIC_URL = "static/"
+STATIC_ROOT = Path("/app/static")
+
+MEDIA_URL = "media/"
+MEDIA_ROOT = Path("/app/media")

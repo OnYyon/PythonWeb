@@ -1,8 +1,11 @@
 repos:
-  - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.18.1
+  - repo: local
     hooks:
       - id: mypy
+        name: mypy
+        entry: env DB_NAME=cinema DB_USER=cinema DB_PASSWORD=P@ssw0rd DB_HOST=localhost DB_PORT=5432 mypy
+        language: python
+        types: [python]
         args:
           [
             --show-error-codes,
@@ -11,6 +14,7 @@ repos:
             --check-untyped-defs,
           ]
         additional_dependencies:
+          - mypy==1.18.1
           - django
           - django-stubs
           - django-split-settings
